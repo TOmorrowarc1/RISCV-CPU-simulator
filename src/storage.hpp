@@ -1,3 +1,6 @@
+#ifndef STORAGE_HPP
+#define STORAGE_HPP
+
 class Register {
 private:
   int Content;
@@ -34,3 +37,5 @@ public:
   void write(int value);
   void refresh();
 };
+
+#endif
