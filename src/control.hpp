@@ -38,6 +38,7 @@ public:
     SB,
     BEQ,
     BNE,
+    BGE,
     BLT,
     BGT,
     BLTU,
@@ -53,6 +54,8 @@ private:
   unsigned int register2;
   unsigned int rd;
   unsigned int immediate;
+  unsigned int func3;
+  unsigned int func7;
 
 public:
   Instruction();
