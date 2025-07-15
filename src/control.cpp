@@ -76,10 +76,11 @@ void Instruction::parse() {
       instructionType = Type::XORI;
       break;
     case 0x5:
-      func7 = (command >> 25) & 0x7f;
-      if (func7 == 0x00) {
+      func7 = (command >> 27) & 0x1f;
+      immediate = immediate & 0x1f;
+      if (func7 == 0x0) {
         instructionType = Type::SRLI;
-      } else if (func7 == 0x20) {
+      } else if (func7 == 0x8) {
         instructionType = Type::SRAI;
       } else {
         assert(false);
