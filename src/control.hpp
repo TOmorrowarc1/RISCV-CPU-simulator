@@ -2,6 +2,43 @@
 #define CONTROL_HPP
 #include <mutex>
 #include <shared_mutex>
+
+namespace Control {
+
+struct FixedControlInfo {
+  int register1 = 0;
+  int register2 = 0;
+  int immdiate = 0;
+};
+
+struct EXEControlInfo {
+  /*
+  The type refers to the calculation ALU executing, while other signs symbolize
+  the source of operands imm-regs or immdiate; forward: 00-regs, 01-EXE_MEM
+  forward, 02-MEM-WB forward.
+  */
+  enum class CalcType { ADD, SUB, SLL, SLT, SLTU, SRL, SRA, XOR, OR, AND };
+  CalcType type = CalcType::ADD;
+  int signForward1 = 0;
+  int signForward2 = 0;
+  bool signImmediate = false;
+};
+
+struct MEMControlInfo {
+  /*
+  The operator indicates which the stage executes: L/S/NOP, while the sign of
+  extend shows whether the result need to be SLL. The size distiguishes the
+  result length: Byte/Half/Words.
+  */
+  int type = 0;
+  int size = 0;
+  bool sign = false;
+};
+
+struct WBControl {
+  bool allow = false;
+};
+}; // namespace Control
 class Instruction {
 public:
   enum class Name {
@@ -96,9 +133,8 @@ public:
   Instruction readMEM();
   Instruction readWB();
   void refreshStage();
-  bool signForward();
-  bool signHarzard();
-  bool signBranch();
 };
+
+// namespace Control
 
 #endif
