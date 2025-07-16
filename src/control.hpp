@@ -62,15 +62,15 @@ public:
   };
 
 private:
-  unsigned int command;
-  Type instructionType;
-  unsigned int operand;
-  unsigned int register1;
-  unsigned int register2;
-  unsigned int rd;
-  unsigned int immediate;
-  unsigned int func3;
-  unsigned int func7;
+  unsigned int command_;
+  Type instruction_type_;
+  unsigned int operand_;
+  unsigned int register1_;
+  unsigned int register2_;
+  unsigned int rd_;
+  unsigned int immediate_;
+  unsigned int func3_;
+  unsigned int func7_;
 
 public:
   Instruction();
@@ -80,8 +80,8 @@ public:
 
 class InsBoard {
 private:
-  Instruction Instructions[4];
-  std::shared_mutex RWlock;
+  Instruction instructions_[4];
+  std::shared_mutex rwlock_;
   InsBoard();
 
 public:

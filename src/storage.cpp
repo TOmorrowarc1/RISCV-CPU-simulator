@@ -1,11 +1,11 @@
 #include "storage.hpp"
 
-Register::Register() { Content = 0; }
-int Register::read() { return Content; }
-void Register::write(int value) { Content = value; }
+Register::Register() { content_ = 0; }
+int Register::read() { return content_; }
+void Register::write(int value) { content_ = value; }
 
 RegisterGroup::RegisterGroup() {
-  for (auto iter : Registers) {
+  for (auto iter : registers_) {
     iter.write(0);
   }
 };
@@ -15,11 +15,11 @@ RegisterGroup &RegisterGroup::getInstance() {
   return instance;
 }
 
-int RegisterGroup::read(int target) { return Registers[target].read(); }
+int RegisterGroup::read(int target) { return registers_[target].read(); }
 int RegisterGroup::write(int target, int value) {
-  Registers[target].write(value);
+  registers_[target].write(value);
 }
 
-int StageRegister::read() { return output.read(); }
-void StageRegister::write(int value) { input.write(value); }
-void StageRegister::refresh() { output.write(input.read()); }
+int StageRegister::read() { return output_.read(); }
+void StageRegister::write(int value) { input_.write(value); }
+void StageRegister::refresh() { output_.write(input_.read()); }

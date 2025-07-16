@@ -3,7 +3,7 @@
 
 class Register {
 private:
-  int Content;
+  int content_;
 
 public:
   Register();
@@ -13,10 +13,10 @@ public:
 
 class RegisterGroup {
 private:
-  Register Registers[32];
+  Register registers_[32];
 
   RegisterGroup() {
-    for (auto iter : Registers) {
+    for (auto iter : registers_) {
       iter.write(0);
     }
   };
@@ -29,8 +29,8 @@ public:
 
 class StageRegister {
 private:
-  Register input;
-  Register output;
+  Register input_;
+  Register output_;
 
 public:
   int read();
