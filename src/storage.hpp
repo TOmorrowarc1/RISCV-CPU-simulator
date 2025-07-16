@@ -1,5 +1,7 @@
 #ifndef STORAGE_HPP
 #define STORAGE_HPP
+#include <mutex>
+#include <shared_mutex>
 
 class Register {
 private:
@@ -14,6 +16,7 @@ public:
 class RegisterGroup {
 private:
   Register registers_[32];
+  std::mutex lock_;
 
   RegisterGroup() {
     for (auto iter : registers_) {
@@ -31,6 +34,7 @@ class StageRegister {
 private:
   Register input_;
   Register output_;
+  std::shared_mutex rwlock_;
 
 public:
   int read();

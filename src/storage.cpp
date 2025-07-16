@@ -14,12 +14,24 @@ RegisterGroup &RegisterGroup::getInstance() {
   static RegisterGroup instance;
   return instance;
 }
-
-int RegisterGroup::read(int target) { return registers_[target].read(); }
+int RegisterGroup::read(int target) {
+  std::unique_lock<std::mutex>(lock_);
+  return registers_[target].read();
+}
 int RegisterGroup::write(int target, int value) {
+  std::unique_lock<std::mutex>(lock_);
   registers_[target].write(value);
 }
 
-int StageRegister::read() { return output_.read(); }
-void StageRegister::write(int value) { input_.write(value); }
-void StageRegister::refresh() { output_.write(input_.read()); }
+int StageRegister::read() {
+  std::shared_lock<std::shared_mutex>(rwlock_);
+  return output_.read();
+}
+void StageRegister::write(int value) {
+  std::unique_lock<std::shared_mutex>(rwlock_);
+  input_.write(value);
+}
+void StageRegister::refresh() {
+  std::unique_lock<std::shared_mutex>(rwlock_);
+  output_.write(input_.read());
+}
