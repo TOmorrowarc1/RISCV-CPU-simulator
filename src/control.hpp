@@ -5,6 +5,22 @@
 class Instruction {
 public:
   enum class Type {
+    /*
+    NOP: empty command.
+    R-type:ADD,SUB,SLT,SLTU,SLL,SRL,SRA,XOR,OR,AND;
+    I-type:
+      ADDI,SLTI,SLTIU,SLLI,SRLI,SRAI,XORI,ORI,ANDI;
+      LW,LH,LHU,LB,LBU;
+      JALR;
+    U-type:
+      LUI,AUIPC;
+    S-type:
+      SW,SH,SB;
+    B-type:
+      BEQ,BNE,BGE,BLT,BLTU,BGEU;
+    J-type:
+      JAL;
+    */
     NOP,
     ADD,
     SUB,
@@ -40,7 +56,6 @@ public:
     BNE,
     BGE,
     BLT,
-    BGT,
     BLTU,
     BGEU,
     JAL,
@@ -76,6 +91,9 @@ public:
   Instruction readMEM();
   Instruction readWB();
   void refreshStage();
+  bool signForward();
+  bool signHarzard();
+  bool signBranch();
 };
 
 #endif
