@@ -3,10 +3,20 @@
 
 Instruction::Instruction() { this->command_ = 0; }
 Instruction::Instruction(unsigned int command) { this->command_ = command; }
+
+std::pair<char, Instruction::Name> Instruction::getType() {
+  return std::pair<char, Instruction::Name>(type_, name_);
+}
+std::pair<unsigned int, unsigned int> Instruction::getRegs() {
+  return std::pair<unsigned int, unsigned int>(register1_, register2_);
+}
+unsigned int Instruction::getRd() { return rd_; }
+int Instruction::getImmdiate() { return immediate_; }
 void Instruction::parse() {
   operand_ = command_ & 0x7f;
   switch (operand_) {
   case 0x33: {
+    type_ = 'R';
     rd_ = (command_ >> 7) & 0x1f;
     register1_ = (command_ >> 15) & 0x1f;
     register2_ = (command_ >> 20) & 0x1f;
@@ -15,39 +25,39 @@ void Instruction::parse() {
     switch (func3_) {
     case 0x0:
       if (func7_ == 0x00) {
-        instruction_type_ = Type::ADD;
+        name_ = Name::ADD;
       } else if (func7_ == 0x20) {
-        instruction_type_ = Type::SUB;
+        name_ = Name::SUB;
       } else {
         assert(false);
       }
       break;
     case 0x1:
-      instruction_type_ = Type::SLL;
+      name_ = Name::SLL;
       break;
     case 0x2:
-      instruction_type_ = Type::SLT;
+      name_ = Name::SLT;
       break;
     case 0x3:
-      instruction_type_ = Type::SLTU;
+      name_ = Name::SLTU;
       break;
     case 0x4:
-      instruction_type_ = Type::XOR;
+      name_ = Name::XOR;
       break;
     case 0x5:
       if (func7_ == 0x00) {
-        instruction_type_ = Type::SRL;
+        name_ = Name::SRL;
       } else if (func7_ == 0x20) {
-        instruction_type_ = Type::SRA;
+        name_ = Name::SRA;
       } else {
         assert(false);
       }
       break;
     case 0x6:
-      instruction_type_ = Type::OR;
+      name_ = Name::OR;
       break;
     case 0x7:
-      instruction_type_ = Type::AND;
+      name_ = Name::AND;
       break;
     default:
       assert(false);
@@ -55,42 +65,43 @@ void Instruction::parse() {
     break;
   }
   case 0x13: {
+    type_ = 'I';
     rd_ = (command_ >> 7) & 0x1f;
     register1_ = (command_ >> 15) & 0x1f;
     func3_ = (command_ >> 12) & 0x7;
     immediate_ = int(command_) >> 20;
     switch (func3_) {
     case 0x0:
-      instruction_type_ = Type::ADDI;
+      name_ = Name::ADDI;
       break;
     case 0x1:
-      instruction_type_ = Type::SLLI;
+      name_ = Name::SLLI;
       break;
     case 0x2:
-      instruction_type_ = Type::SLTI;
+      name_ = Name::SLTI;
       break;
     case 0x3:
-      instruction_type_ = Type::SLTIU;
+      name_ = Name::SLTIU;
       break;
     case 0x4:
-      instruction_type_ = Type::XORI;
+      name_ = Name::XORI;
       break;
     case 0x5:
       func7_ = (command_ >> 27) & 0x1f;
       immediate_ = immediate_ & 0x1f;
       if (func7_ == 0x0) {
-        instruction_type_ = Type::SRLI;
+        name_ = Name::SRLI;
       } else if (func7_ == 0x8) {
-        instruction_type_ = Type::SRAI;
+        name_ = Name::SRAI;
       } else {
         assert(false);
       }
       break;
     case 0x6:
-      instruction_type_ = Type::ORI;
+      name_ = Name::ORI;
       break;
     case 0x7:
-      instruction_type_ = Type::ANDI;
+      name_ = Name::ANDI;
       break;
     default:
       assert(false);
@@ -98,25 +109,26 @@ void Instruction::parse() {
     break;
   }
   case 0x3: {
+    type_ = 'I';
     rd_ = (command_ >> 7) & 0x1f;
     register1_ = (command_ >> 15) & 0x1f;
     func3_ = (command_ >> 12) & 0x7;
     immediate_ = int(command_) >> 20;
     switch (func3_) {
     case 0x0:
-      instruction_type_ = Type::LB;
+      name_ = Name::LB;
       break;
     case 0x1:
-      instruction_type_ = Type::LH;
+      name_ = Name::LH;
       break;
     case 0x2:
-      instruction_type_ = Type::LW;
+      name_ = Name::LW;
       break;
     case 0x4:
-      instruction_type_ = Type::LBU;
+      name_ = Name::LBU;
       break;
     case 0x5:
-      instruction_type_ = Type::LHU;
+      name_ = Name::LHU;
       break;
     default:
       assert(false);
@@ -124,33 +136,36 @@ void Instruction::parse() {
     break;
   }
   case 0x67: {
+    type_ = 'I';
     rd_ = (command_ >> 7) & 0x1f;
     register1_ = (command_ >> 15) & 0x1f;
     func3_ = (command_ >> 12) & 0x7;
     immediate_ = int(command_) >> 20;
     if (func3_ == 0x0) {
-      instruction_type_ = Type::JALR;
+      name_ = Name::JALR;
     } else {
       assert(false);
     }
     break;
   }
   case 0x23: {
+    type_ = 'S';
     func3_ = (command_ >> 12) & 0x7;
     register1_ = (command_ >> 15) & 0x1f;
     register2_ = (command_ >> 20) & 0x1f;
-    immediate_ = int(((((command_ >> 25) & 0x7f) << 5) | ((command_ >> 7) & 0x1f))
-                    << 20) >>
-                20;
+    immediate_ =
+        int(((((command_ >> 25) & 0x7f) << 5) | ((command_ >> 7) & 0x1f))
+            << 20) >>
+        20;
     switch (func3_) {
     case 0x0:
-      instruction_type_ = Type::SB;
+      name_ = Name::SB;
       break;
     case 0x1:
-      instruction_type_ = Type::SH;
+      name_ = Name::SH;
       break;
     case 0x2:
-      instruction_type_ = Type::SW;
+      name_ = Name::SW;
       break;
     default:
       assert(false);
@@ -158,32 +173,34 @@ void Instruction::parse() {
     break;
   }
   case 0x63: {
+    type_ = 'B';
     register1_ = (command_ >> 15) & 0x1f;
     register2_ = (command_ >> 20) & 0x1f;
     func3_ = (command_ >> 12) & 0x7;
     immediate_ =
         int(((((command_ >> 7) & 0x1) << 11) | (((command_ >> 8) & 0xf) << 1) |
-             (((command_ >> 25) & 0x3f) << 5) | (((command_ >> 31) & 0x1) << 12))
+             (((command_ >> 25) & 0x3f) << 5) |
+             (((command_ >> 31) & 0x1) << 12))
             << 19) >>
         19;
     switch (func3_) {
     case 0x0:
-      instruction_type_ = Type::BEQ;
+      name_ = Name::BEQ;
       break;
     case 0x1:
-      instruction_type_ = Type::BNE;
+      name_ = Name::BNE;
       break;
     case 0x4:
-      instruction_type_ = Type::BLT;
+      name_ = Name::BLT;
       break;
     case 0x5:
-      instruction_type_ = Type::BGE;
+      name_ = Name::BGE;
       break;
     case 0x6:
-      instruction_type_ = Type::BLTU;
+      name_ = Name::BLTU;
       break;
     case 0x7:
-      instruction_type_ = Type::BGEU;
+      name_ = Name::BGEU;
       break;
     default:
       assert(false);
@@ -191,18 +208,21 @@ void Instruction::parse() {
     break;
   }
   case 0x37: {
+    type_ = 'U';
     rd_ = (command_ >> 7) & 0x1f;
-    immediate_ = command_ & 0xfffff000;
-    instruction_type_ = Type::LUI;
+    immediate_ = int(command_ & 0xfffff000);
+    name_ = Name::LUI;
     break;
   }
   case 0x17: {
+    type_ = 'U';
     rd_ = (command_ >> 7) & 0x1f;
-    immediate_ = command_ & 0xfffff000;
-    instruction_type_ = Type::AUIPC;
+    immediate_ = int(command_ & 0xfffff000);
+    name_ = Name::AUIPC;
     break;
   }
   case 0x6f: {
+    type_ = 'J';
     rd_ = (command_ >> 7) & 0x1f;
     immediate_ =
         int(((((command_ >> 12) & 0xff) << 12) |
@@ -210,7 +230,7 @@ void Instruction::parse() {
              (((command_ >> 21) & 0x3ff) << 1) | (((command_ >> 31) & 1) << 20))
             << 11) >>
         11;
-    instruction_type_ = Type::JAL;
+    name_ = Name::JAL;
     break;
   }
   default: {

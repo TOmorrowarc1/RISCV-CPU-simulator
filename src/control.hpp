@@ -4,7 +4,7 @@
 #include <shared_mutex>
 class Instruction {
 public:
-  enum class Type {
+  enum class Name {
     /*
     NOP: empty command.
     R-type:ADD,SUB,SLT,SLTU,SLL,SRL,SRA,XOR,OR,AND;
@@ -63,18 +63,23 @@ public:
 
 private:
   unsigned int command_;
-  Type instruction_type_;
+  char type_;
+  Name name_;
   unsigned int operand_;
+  unsigned int func3_;
+  unsigned int func7_;
   unsigned int register1_;
   unsigned int register2_;
   unsigned int rd_;
-  unsigned int immediate_;
-  unsigned int func3_;
-  unsigned int func7_;
+  int immediate_;
 
 public:
   Instruction();
   Instruction(unsigned int command);
+  std::pair<char, Name> getType();
+  std::pair<unsigned int, unsigned int> getRegs();
+  unsigned int getRd();
+  int getImmdiate();
   void parse();
 };
 
