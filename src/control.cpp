@@ -260,7 +260,14 @@ Control::AllControlInfo Instruction::parse() {
   }
 }
 
-InsBoard::InsBoard() {}
+InsBoard::InsBoard() {
+  std::unique_lock<std::shared_mutex>(rwlock_);
+  for (int i = 0; i < 4; ++i) {
+    exe_control_.push_front(Control::EXEControlInfo());
+    mem_control_.push_front(Control::MEMControlInfo());
+    wb_control_.push_front(Control::WBControlInfo());
+  }
+}
 
 InsBoard &InsBoard::getInstance() {
   static InsBoard instance;
