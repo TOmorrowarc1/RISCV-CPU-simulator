@@ -1,6 +1,7 @@
 #ifndef MY_STL_HPP
 #define MY_STL_HPP
 
+namespace sjtu {
 template <typename T, int MAX_SIZE> class queue {
 private:
   T data[MAX_SIZE];
@@ -66,5 +67,6 @@ public:
     return temp;
   }
 };
+}; // namespace sjtu
 
 #endif
