@@ -35,3 +35,17 @@ void StageRegister::refresh() {
   std::unique_lock<std::shared_mutex>(rwlock_);
   output_.write(input_.read());
 }
+
+StageRegister IF_ID_reg_ins;      // for instruction
+StageRegister IF_ID_reg_pc;       // for PC count
+StageRegister IF_ID_reg_has_jump; // for jump or not
+StageRegister ID_IF_reg_stall;    // for hazard
+
+StageRegister ID_EX_reg_1; // for register1
+StageRegister ID_EX_reg_2; // for register2
+
+StageRegister EXE_MEM_reg_alu;   // for the oprand of next stages
+StageRegister EXE_MEM_reg_reg2;  // for register2 which may store
+StageRegister EXE_IF_reg_branch; // for possible branch miss
+
+StageRegister MEM_WB_reg_1; // for result need be written back
