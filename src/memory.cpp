@@ -1,11 +1,6 @@
 #include "memory.hpp"
 
-Memory &Memory::getDataInstance() {
-  static Memory instance;
-  return instance;
-}
-
-Memory &Memory::getInsInstance() {
+Memory &Memory::getInstance() {
   static Memory instance;
   return instance;
 }
@@ -23,7 +18,7 @@ LSDealer &LSDealer::getInstance() {
 
 unsigned int LSDealer::load(Control::MEMControlInfo::MemSize size,
                             unsigned int address, bool extend) {
-  unsigned int result = Memory::getDataInstance().load(address);
+  unsigned int result = Memory::getInstance().load(address);
   int origin_bits;
   switch (size) {
   case Control::MEMControlInfo::MemSize::BYTE:
@@ -61,5 +56,5 @@ void LSDealer::store(Control::MEMControlInfo::MemSize size,
   default:
     throw std::exception();
   }
-  Memory::getDataInstance().store(address, data);
+  Memory::getInstance().store(address, data);
 }

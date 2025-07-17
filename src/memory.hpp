@@ -10,7 +10,7 @@ private:
   Memory() = default;
 
 public:
-  static Memory &getDataInstance();
+  static Memory &getInstance();
   unsigned int load(unsigned int address);
   void store(unsigned int address, unsigned int content);
 };
