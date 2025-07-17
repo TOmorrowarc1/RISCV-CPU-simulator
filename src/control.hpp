@@ -61,6 +61,7 @@ struct EXEControlInfo {
   CalcType type = CalcType::ADD;
   int immdiate = 0;
   JumpType jump = JumpType::NOP;
+  int pc_may = 0;
   int pc = 0;
   int signForward1 = 0;
   int signForward2 = 0;
@@ -88,18 +89,6 @@ struct WBControlInfo {
 };
 }; // namespace Control
 
-class Instruction {
-private:
-  unsigned int command_;
-  unsigned int pc_next_;
-  bool has_jump_;
-
-public:
-  Instruction();
-  Instruction(unsigned int command);
-  Control::AllControlInfo parse();
-};
-
 class InsBoard {
 private:
   // remember to fill them before start.
@@ -112,7 +101,10 @@ private:
 
 public:
   static InsBoard &getInstance();
-  Control::RegControlInfo IR(Instruction &target);
+  Control::RegControlInfo IR(unsigned int command, unsigned int pc,
+                             bool has_jump);
+  Control::AllControlInfo parse(unsigned int command, unsigned int pc,
+                                bool has_jump);
   void injectBubble();
   void stallPipeLine();
   void flushPipeLine();
@@ -120,11 +112,23 @@ public:
   Control::EXEControlInfo readEXEControl();
   Control::MEMControlInfo readMEMControl();
   Control::WBControlInfo readWBControlInfo();
-  Control::RegControlInfo readRegControl();
 };
 
-class ProgramCounter{
-  
+class ProgramCounter {
+  // The value in pc_ at the END of the phrase is the address of the ins in
+  // IF-ID_reg.
+private:
+  StatusRegister pc_;
+  unsigned int memory_[1024] = {0};
+  ProgramCounter(){};
+
+public:
+  static ProgramCounter &getInstance();
+  void setAllow(bool sign);
+  unsigned int getCommand();
+  unsigned int getAddress(unsigned int branch);
+  std::pair<unsigned int, bool> branchPredict(unsigned command);
+  void refreshStage();
 };
 
 #endif

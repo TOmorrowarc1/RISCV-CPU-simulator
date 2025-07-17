@@ -11,7 +11,6 @@ private:
 
 public:
   static Memory &getDataInstance();
-  static Memory &getInsInstance();
   unsigned int load(unsigned int address);
   void store(unsigned int address, unsigned int content);
 };
