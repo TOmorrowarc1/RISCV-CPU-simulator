@@ -1,8 +1,8 @@
 #include "storage.hpp"
 
 Register::Register() { content_ = 0; }
-int Register::read() { return content_; }
-void Register::write(int value) { content_ = value; }
+unsigned int Register::read() { return content_; }
+void Register::write(unsigned int value) { content_ = value; }
 
 RegisterGroup::RegisterGroup() {
   for (auto iter : registers_) {
@@ -14,20 +14,20 @@ RegisterGroup &RegisterGroup::getInstance() {
   static RegisterGroup instance;
   return instance;
 }
-int RegisterGroup::read(int target) {
+unsigned int RegisterGroup::read(unsigned int target) {
   std::unique_lock<std::mutex>(lock_);
   return registers_[target].read();
 }
-int RegisterGroup::write(int target, int value) {
+void RegisterGroup::write(int target, unsigned int value) {
   std::unique_lock<std::mutex>(lock_);
   registers_[target].write(value);
 }
 
-int StatusRegister::read() {
+unsigned int StatusRegister::read() {
   std::shared_lock<std::shared_mutex>(rwlock_);
   return output_.read();
 }
-void StatusRegister::write(int value) {
+void StatusRegister::write(unsigned int value) {
   std::unique_lock<std::shared_mutex>(rwlock_);
   input_.write(value);
 }

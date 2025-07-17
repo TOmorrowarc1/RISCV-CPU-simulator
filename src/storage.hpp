@@ -5,12 +5,12 @@
 
 class Register {
 private:
-  int content_;
+  unsigned int content_;
 
 public:
   Register();
-  int read();
-  void write(int value);
+  unsigned int read();
+  void write(unsigned int value);
 };
 
 class RegisterGroup {
@@ -26,8 +26,8 @@ private:
 
 public:
   static RegisterGroup &getInstance();
-  int read(int target);
-  int write(int target, int value);
+  unsigned int read(unsigned int target);
+  void write(int target, unsigned int value);
 };
 
 class StatusRegister {
@@ -38,8 +38,8 @@ private:
   bool allow_;
 
 public:
-  int read();
-  void write(int value);
+  unsigned int read();
+  void write(unsigned int value);
   void setAllow(bool sign);
   void refresh();
 };
