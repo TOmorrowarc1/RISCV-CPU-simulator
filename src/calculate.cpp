@@ -6,17 +6,58 @@ ALU &ALU::getInstance() {
   return instance;
 }
 
-int ALU::chooseSecondInput(bool sign1, bool sign2, int reg2, int imm,
-                           int forward) {
-  int result = sign1 ? reg2 : imm;
-  result = sign2 ? forward : result;
-  return result;
-}
-
-int ALU::calculate(Instruction::Name calc_type, int input1, int input2) {
-  int result = 0;
+unsigned int ALU::calculate(Control::EXEControlInfo::CalcType calc_type,
+                            unsigned int input1, unsigned int input2) {
+  unsigned int result = 0;
   switch (calc_type) {
-    case 
+  case Control::EXEControlInfo::CalcType::ADD:
+    result = input1 + input2;
+    break;
+  case Control::EXEControlInfo::CalcType::SUB:
+    result = input1 - input2;
+    break;
+  case Control::EXEControlInfo::CalcType::SLL:
+    result = input1 << input2;
+    break;
+  case Control::EXEControlInfo::CalcType::LT:
+    // static_cast for 3 times.
+    result = int(input1) < int(input2);
+    break;
+  case Control::EXEControlInfo::CalcType::LTU:
+    result = input1 < input2;
+    break;
+  case Control::EXEControlInfo::CalcType::GE:
+    result = int(input1) >= int(input2);
+    break;
+  case Control::EXEControlInfo::CalcType::GEU:
+    result = input1 >= input2;
+    break;
+  case Control::EXEControlInfo::CalcType::EQ:
+    result = input1 == input2;
+    break;
+  case Control::EXEControlInfo::CalcType::NE:
+    result = input1 != input2;
+    break;
+  case Control::EXEControlInfo::CalcType::SRL:
+    result = input1 >> input2;
+    break;
+  case Control::EXEControlInfo::CalcType::SRA:
+    result = int(input1) >> input2;
+    break;
+  case Control::EXEControlInfo::CalcType::OR:
+    result = input1 | input2;
+    break;
+  case Control::EXEControlInfo::CalcType::AND:
+    result = input1 & input2;
+    break;
+  case Control::EXEControlInfo::CalcType::XOR:
+    result = input1 ^ input2;
+    break;
+  case Control::EXEControlInfo::CalcType::PRINTIMM:
+    result = input2;
+    break;
+  default:
+    throw std::exception();
   }
-  return std::pair<bool, int>;
+  return result;
 }

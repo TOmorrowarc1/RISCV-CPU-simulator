@@ -7,7 +7,7 @@ private:
 
 public:
   static ALU &getInstance();
-  int chooseSecondInput(bool sign1, bool sign2, int reg2, int imm, int forward);
-  int calculate(Instruction::Name calc_type, int input1, int input2);
+  unsigned int calculate(Control::EXEControlInfo::CalcType calc_type,
+                         unsigned int operand1, unsigned int operand2);
 };
 #endif
