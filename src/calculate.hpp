@@ -3,7 +3,6 @@
 #include "control.hpp"
 class ALU {
 private:
-  bool zero_flag_;
   ALU();
 
 public:
