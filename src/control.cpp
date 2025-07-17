@@ -1,4 +1,5 @@
 #include "control.hpp"
+#include "storage.hpp"
 #include <cassert>
 
 Instruction::Instruction() { command_ = 0; }
@@ -264,4 +265,98 @@ InsBoard::InsBoard() {}
 InsBoard &InsBoard::getInstance() {
   static InsBoard instance;
   return instance;
+}
+
+Control::RegControlInfo InsBoard::IR(Instruction &target) {
+  /*
+  First interpret the instruction, then compare the result with signals in EXE
+  and LS for forwarding. After all signals prepared well, launch them onto
+  board.
+  */
+  Control::AllControlInfo control_signals = target.parse();
+  int register1 = control_signals.reg_control.register1;
+  int register2 = control_signals.reg_control.register2;
+  Control::WBControlInfo exe_write_back;
+  Control::WBControlInfo mem_write_back;
+  Control::MEMControlInfo exe_mem_control;
+  {
+    std::shared_lock<std::shared_mutex>(rwlock_);
+    exe_write_back = wb_control_[1];
+    mem_write_back = wb_control_[2];
+    exe_mem_control = mem_control_[1];
+  }
+
+  if (mem_write_back.allow) {
+    if (mem_write_back.rd == register1) {
+      control_signals.exe_control.signForward1 = 2;
+    } else if (mem_write_back.rd == register2) {
+      control_signals.exe_control.signForward2 = 2;
+    }
+  }
+  if (exe_write_back.allow) {
+    bool flag = false;
+    if (exe_write_back.rd == register1) {
+      control_signals.exe_control.signForward1 = 1;
+      flag = true;
+    } else if (exe_write_back.rd == register2) {
+      control_signals.exe_control.signForward2 = 1;
+      flag = true;
+    }
+    if (flag &&
+        exe_mem_control.type == Control::MEMControlInfo::MemType::LOAD) {
+      stallPipeLine();
+      return;
+    }
+  }
+  {
+    std::unique_lock<std::shared_mutex>(rwlock_);
+    exe_control_.push_front(control_signals.exe_control);
+    mem_control_.push_front(control_signals.mem_control);
+    wb_control_.push_front(control_signals.wb_control);
+  }
+  return control_signals.reg_control;
+}
+
+void InsBoard::injectBubble() {
+  {
+    std::unique_lock<std::shared_mutex>(rwlock_);
+    exe_control_.push_front(Control::EXEControlInfo());
+    mem_control_.push_front(Control::MEMControlInfo());
+    wb_control_.push_front(Control::WBControlInfo());
+  }
+}
+void InsBoard::stallPipeLine() {
+  // The bubble has been injected in refreshStage().
+  ID_IF_reg_stall.write(1);
+}
+
+void InsBoard::flushPipeLine() {
+  // The wrong ins is in ID and EXE, and only one need to be disabled is EXE as
+  // the ID is bubbled.
+  std::unique_lock<std::shared_mutex>(rwlock_);
+  mem_control_.write(1).type = Control::MEMControlInfo::MemType::NOP;
+  wb_control_.write(1).allow = false;
+}
+
+Control::EXEControlInfo InsBoard::readEXEControl() {
+  std::shared_lock<std::shared_mutex>(rwlock_);
+  return exe_control_[1];
+}
+
+Control::MEMControlInfo InsBoard::readMEMControl() {
+  std::shared_lock<std::shared_mutex>(rwlock_);
+  return mem_control_[2];
+}
+
+Control::WBControlInfo InsBoard::readWBControlInfo() {
+  std::shared_lock<std::shared_mutex>(rwlock_);
+  return wb_control_[3];
+}
+
+void InsBoard::refreshStage() {
+  injectBubble();
+  std::unique_lock<std::shared_mutex>(rwlock_);
+  exe_control_.pop_back();
+  mem_control_.pop_back();
+  wb_control_.pop_back();
 }

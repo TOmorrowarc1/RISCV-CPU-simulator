@@ -35,6 +35,12 @@ public:
     }
     return data[plus(front_, place)];
   }
+  T &write(int place) {
+    if (empty()) {
+      throw container_is_empty();
+    }
+    return data[plus(front_, place)];
+  }
 
   void push_back(const T &value) {
     data[back_] = value;

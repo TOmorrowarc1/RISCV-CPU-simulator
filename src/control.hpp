@@ -103,7 +103,7 @@ public:
 class InsBoard {
 private:
   // remember to fill them before start.
-  sjtu::queue<Control::RegControlInfo, 4> reg_control_;
+  // operator[]: 0-ID,1-EXE,2-MEM,3-WB.
   sjtu::queue<Control::EXEControlInfo, 4> exe_control_;
   sjtu::queue<Control::MEMControlInfo, 4> mem_control_;
   sjtu::queue<Control::WBControlInfo, 4> wb_control_;
@@ -112,7 +112,8 @@ private:
 
 public:
   static InsBoard &getInstance();
-  void IR(Instruction &target);
+  Control::RegControlInfo IR(Instruction &target);
+  void injectBubble();
   void stallPipeLine();
   void flushPipeLine();
   void refreshStage();
