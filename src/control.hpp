@@ -123,4 +123,8 @@ public:
   Control::RegControlInfo readRegControl();
 };
 
+class ProgramCounter{
+  
+};
+
 #endif
