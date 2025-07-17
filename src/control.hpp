@@ -36,7 +36,9 @@ struct EXEControlInfo {
   /*
   The type refers to the calculation ALU executing, while other signs symbolize
   the source of operands imm-regs or immdiate; forward: 00-regs, 01-EXE_MEM
-  forward, 02-MEM-WB forward.
+  forward, 02-MEM-WB forward. OprandBools indicate whether oprand1 is from reg1
+  or pc, and whether oprand2 is from reg2 or immdiate, while the Resultbool
+  serves for JALR.
   */
   enum class CalcType {
     ADD,
@@ -62,7 +64,9 @@ struct EXEControlInfo {
   int pc = 0;
   int signForward1 = 0;
   int signForward2 = 0;
+  bool signPC = false;
   bool signImmediate = false;
+  bool signResultPC = false;
 };
 
 struct MEMControlInfo {

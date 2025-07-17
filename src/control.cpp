@@ -13,7 +13,6 @@ Control::AllControlInfo Instruction::parse() {
     // For type 'R':
     result.reg_control.register1 = (command_ >> 15) & 0x1f;
     result.reg_control.register2 = (command_ >> 20) & 0x1f;
-    result.exe_control.signImmediate = false;
     result.wb_control.allow = true;
     result.wb_control.rd = (command_ >> 7) & 0x1f;
     unsigned int func3_ = (command_ >> 12) & 0x7;
@@ -61,6 +60,7 @@ Control::AllControlInfo Instruction::parse() {
     break;
   }
   case 0x13: {
+    // for type 'I': immediate calculation.
     result.reg_control.register1 = (command_ >> 15) & 0x1f;
     result.exe_control.signImmediate = true;
     result.exe_control.immdiate = int(command_) >> 20;
@@ -107,6 +107,7 @@ Control::AllControlInfo Instruction::parse() {
     break;
   }
   case 0x3: {
+    // for type 'I': load reg2 into reg1+imm.
     result.reg_control.register1 = (command_ >> 15) & 0x1f;
     result.exe_control.signImmediate = true;
     result.exe_control.immdiate = int(command_) >> 20;
@@ -141,7 +142,9 @@ Control::AllControlInfo Instruction::parse() {
     break;
   }
   case 0x67: {
+    // for type 'I': JALR- pc=reg1+imm, rd=pc+4
     result.reg_control.register1 = (command_ >> 15) & 0x1f;
+    result.exe_control.signResultPC = true;
     result.exe_control.signImmediate = true;
     result.exe_control.immdiate = int(command_) >> 20;
     result.wb_control.allow = true;
@@ -155,8 +158,10 @@ Control::AllControlInfo Instruction::parse() {
     break;
   }
   case 0x23: {
+    // for type 'S': store reg2 into reg1+imm;
     result.reg_control.register1 = (command_ >> 15) & 0x1f;
     result.reg_control.register2 = (command_ >> 20) & 0x1f;
+    result.exe_control.signImmediate = true;
     result.exe_control.immdiate =
         int(((((command_ >> 25) & 0x7f) << 5) | ((command_ >> 7) & 0x1f))
             << 20) >>
@@ -179,17 +184,19 @@ Control::AllControlInfo Instruction::parse() {
     break;
   }
   case 0x63: {
+    // for type 'B': conditional branch: examine the prediction and write back
+    // the possible result, which stores in the "pc" of ins.
     result.reg_control.register1 = (command_ >> 15) & 0x1f;
     result.reg_control.register2 = (command_ >> 20) & 0x1f;
     result.exe_control.jump = has_jump_
                                   ? Control::EXEControlInfo::JumpType::BYES
                                   : Control::EXEControlInfo::JumpType::BNO;
-    result.exe_control.immdiate =
+    /*result.exe_control.immdiate =
         int(((((command_ >> 7) & 0x1) << 11) | (((command_ >> 8) & 0xf) << 1) |
              (((command_ >> 25) & 0x3f) << 5) |
              (((command_ >> 31) & 0x1) << 12))
             << 19) >>
-        19;
+        19;*/
     unsigned int func3_ = (command_ >> 12) & 0x7;
     switch (func3_) {
     case 0x0:
@@ -216,6 +223,7 @@ Control::AllControlInfo Instruction::parse() {
     break;
   }
   case 0x37: {
+    // for type 'U': LUI ins-ALU do nothing.
     result.exe_control.type = Control::EXEControlInfo::CalcType::PRINTIMM;
     result.exe_control.signImmediate = true;
     result.exe_control.immdiate = int(command_ & 0xfffff000) << 12;
@@ -224,7 +232,9 @@ Control::AllControlInfo Instruction::parse() {
     break;
   }
   case 0x17: {
+    // for type 'U': AUIPC ins-PC+imm, what a black sheep!
     result.exe_control.type = Control::EXEControlInfo::CalcType::ADD;
+    result.exe_control.signPC = true;
     result.exe_control.signImmediate = true;
     result.exe_control.immdiate = int(command_ & 0xfffff000) << 12;
     result.wb_control.allow = true;
@@ -232,17 +242,16 @@ Control::AllControlInfo Instruction::parse() {
     break;
   }
   case 0x6f: {
-    /*
-    type_ = 'J';
-    rd_ = (command_ >> 7) & 0x1f;
-    immediate_ =
+    // for type 'J': JAL: just write the rd.
+    result.exe_control.signResultPC = true;
+    result.wb_control.allow = true;
+    result.wb_control.rd = (command_ >> 7) & 0x1f;
+    /*immediate_ =
         int(((((command_ >> 12) & 0xff) << 12) |
              (((command_ >> 20) & 0x1) << 11) |
              (((command_ >> 21) & 0x3ff) << 1) | (((command_ >> 31) & 1) << 20))
             << 11) >>
-        11;
-    name_ = Name::JAL;
-    break;*/
+        11;*/
   }
   default: {
     assert(false);
@@ -250,11 +259,7 @@ Control::AllControlInfo Instruction::parse() {
   }
 }
 
-InsBoard::InsBoard() {
-  for (int i = 0; i < 3; ++i) {
-    instructions_[i] = 0;
-  }
-}
+InsBoard::InsBoard() {}
 
 InsBoard &InsBoard::getInstance() {
   static InsBoard instance;
