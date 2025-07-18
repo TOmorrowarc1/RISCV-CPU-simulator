@@ -3,6 +3,7 @@
 #include "mySTL.hpp"
 #include <mutex>
 #include <shared_mutex>
+#include <unordered_map>
 
 /*
 NOP: empty command.
@@ -118,6 +119,8 @@ class ProgramCounter {
   // The value in pc_ at the END of the phrase is the address of the ins in
   // IF-ID_reg.
 private:
+  // Stimulate the behavior of the BPU.
+  std::unordered_map<unsigned int, JumpState> BPU_;
   StatusRegister pc_;
   unsigned int memory_[1024] = {0};
   ProgramCounter(){};
@@ -127,8 +130,20 @@ public:
   void setAllow(bool sign);
   unsigned int getCommand();
   unsigned int getAddress(unsigned int branch);
-  std::pair<unsigned int, bool> branchPredict(unsigned command);
+  unsigned int branchPredict(unsigned int address);
+  void refreshBranch(unsigned int pc, unsigned int target_addr, bool jump_);
   void refreshStage();
+};
+
+class JumpState {
+private:
+  unsigned int status = 1;
+  unsigned int address = 0;
+
+public:
+  void refreshCondition(bool if_jump);
+  void refreshAddress(unsigned int new_addr);
+  unsigned int predict();
 };
 
 #endif

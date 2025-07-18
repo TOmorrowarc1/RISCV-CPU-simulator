@@ -377,17 +377,46 @@ unsigned int ProgramCounter::getAddress(unsigned int branch) {
   }
   unsigned int address = pc_.read();
   unsigned int command = memory_[address];
-  auto branch_addr = branchPredict(command);
-  IF_ID_reg_pc.write(branch_addr.first);
-  if (branch_addr.second) {
+  unsigned int branch_addr = branchPredict(command);
+  IF_ID_reg_pc.write(branch_addr);
+  if (branch_addr) {
     IF_ID_reg_has_jump.write(1);
-    return branch_addr.first;
+    return branch_addr;
   }
   IF_ID_reg_has_jump.write(0);
   return address;
 }
 
-std::pair<unsigned int, bool>
-ProgramCounter::branchPredict(unsigned int command) {}
+unsigned int ProgramCounter::branchPredict(unsigned int address) {
+  auto result = BPU_.find(address);
+  if (result != BPU_.end()) {
+    return result->second.predict();
+  }
+  return 0;
+}
+
+void ProgramCounter::refreshBranch(unsigned int pc, unsigned int target_addr,
+                                   bool jump) {
+  auto result = BPU_.find(pc);
+  if (result != BPU_.end()) {
+    result->second.refreshCondition(jump);
+    result->second.refreshAddress(target_addr);
+  }
+}
 
 void ProgramCounter::refreshStage() { pc_.refresh(); }
+
+void JumpState::refreshCondition(bool if_jump) {
+  if (if_jump) {
+    status = status == 3 ? status + 1 : status;
+  } else {
+    status = status == 0 ? status - 1 : status;
+  }
+}
+void JumpState::refreshAddress(unsigned int new_addr) { address = new_addr; }
+unsigned int JumpState::predict() {
+  if (status > 1) {
+    return address;
+  }
+  return 0;
+}
