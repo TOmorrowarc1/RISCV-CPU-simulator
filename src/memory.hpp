@@ -20,7 +20,7 @@ private:
   LSDealer();
 
 public:
-  LSDealer &getInstance();
+  static LSDealer &getInstance();
   unsigned int load(Control::MEMControlInfo::MemSize size, unsigned int address,
                     bool extend);
   void store(Control::MEMControlInfo::MemSize size, unsigned int address,

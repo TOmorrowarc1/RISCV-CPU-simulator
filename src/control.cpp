@@ -147,7 +147,6 @@ Control::AllControlInfo InsBoard::parse(unsigned int command, unsigned int pc) {
     result.exe_control.branch_addr = -1; // just for jalr.
     result.wb_control.allow = true;
     result.wb_control.rd = (command >> 7) & 0x1f;
-    unsigned int func3_ = (command >> 12) & 0x7;
     break;
   }
   case 0x23: {
@@ -178,7 +177,7 @@ Control::AllControlInfo InsBoard::parse(unsigned int command, unsigned int pc) {
   }
   case 0x63: {
     /* for type 'B': conditional branch: examine the prediction and write back
-    the possible result, which stores in the "pc" of ins.*/
+    the possible result, which stores in the "branch_addr" of ins.*/
     result.reg_control.register1 = (command >> 15) & 0x1f;
     result.reg_control.register2 = (command >> 20) & 0x1f;
     result.exe_control.immdiate =
