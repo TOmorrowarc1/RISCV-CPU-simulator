@@ -15,6 +15,9 @@ RegisterGroup &RegisterGroup::getInstance() {
   return instance;
 }
 unsigned int RegisterGroup::read(unsigned int target) {
+  if (target == 0) {
+    return 0;
+  }
   std::unique_lock<std::mutex>(lock_);
   return registers_[target].read();
 }
