@@ -189,12 +189,12 @@ Control::AllControlInfo InsBoard::parse(unsigned int command, unsigned int pc,
     result.reg_control.register2 = (command >> 20) & 0x1f;
     result.exe_control.jump = has_jump ? Control::EXEControlInfo::JumpType::BYES
                                        : Control::EXEControlInfo::JumpType::BNO;
-    /*result.exe_control.immdiate =
+    result.exe_control.immdiate =
         int(((((command >> 7) & 0x1) << 11) | (((command >> 8) & 0xf) << 1) |
-             (((command >> 25) & 0x3f) << 5) |
-             (((command >> 31) & 0x1) << 12))
+             (((command >> 25) & 0x3f) << 5) | (((command >> 31) & 0x1) << 12))
             << 19) >>
-        19;*/
+        19;
+    result.exe_control.branch_addr = pc + result.exe_control.immdiate;
     unsigned int func3_ = (command >> 12) & 0x7;
     switch (func3_) {
     case 0x0:
@@ -241,15 +241,17 @@ Control::AllControlInfo InsBoard::parse(unsigned int command, unsigned int pc,
   }
   case 0x6f: {
     // for type 'J': JAL: just write the rd.
+    // if jump is confirmed by the pc(not 0).
     result.exe_control.signResultPC = true;
     result.wb_control.allow = true;
     result.wb_control.rd = (command >> 7) & 0x1f;
-    /*immediate_ =
+    result.exe_control.immdiate =
         int(((((command >> 12) & 0xff) << 12) |
              (((command >> 20) & 0x1) << 11) |
              (((command >> 21) & 0x3ff) << 1) | (((command >> 31) & 1) << 20))
             << 11) >>
-        11;*/
+        11;
+    result.exe_control.branch_addr = pc + result.exe_control.immdiate;
   }
   default: {
     assert(false);
@@ -371,19 +373,15 @@ void ProgramCounter::setAllow(bool sign) { pc_.setAllow(sign); }
 
 unsigned int ProgramCounter::getCommand() { return memory_[pc_.read()]; }
 
-unsigned int ProgramCounter::getAddress(unsigned int branch) {
-  if (EXE_IF_reg_branch.read() != 0) {
-    return EXE_IF_reg_branch.read();
+unsigned int ProgramCounter::getNextAddress(unsigned int branch) {
+  if (branch != 0) {
+    return branch;
   }
   unsigned int address = pc_.read();
-  unsigned int command = memory_[address];
-  unsigned int branch_addr = branchPredict(command);
-  IF_ID_reg_pc.write(branch_addr);
-  if (branch_addr) {
-    IF_ID_reg_has_jump.write(1);
+  unsigned int branch_addr = branchPredict(address);
+  if (branch_addr != 0) {
     return branch_addr;
   }
-  IF_ID_reg_has_jump.write(0);
   return address;
 }
 

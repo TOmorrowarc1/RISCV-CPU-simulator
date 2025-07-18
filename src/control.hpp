@@ -22,12 +22,14 @@ J-type:
   JAL;
 */
 namespace Control {
+
 struct AllControlInfo {
   RegControlInfo reg_control;
   EXEControlInfo exe_control;
   MEMControlInfo mem_control;
   WBControlInfo wb_control;
 };
+
 struct RegControlInfo {
   int register1 = 0;
   int register2 = 0;
@@ -62,8 +64,8 @@ struct EXEControlInfo {
   CalcType type = CalcType::ADD;
   int immdiate = 0;
   JumpType jump = JumpType::NOP;
-  int pc_may = 0;
   int pc = 0;
+  int branch_addr = 0;
   int signForward1 = 0;
   int signForward2 = 0;
   bool signPC = false;
@@ -129,7 +131,7 @@ public:
   static ProgramCounter &getInstance();
   void setAllow(bool sign);
   unsigned int getCommand();
-  unsigned int getAddress(unsigned int branch);
+  unsigned int getNextAddress(unsigned int branch);
   unsigned int branchPredict(unsigned int address);
   void refreshBranch(unsigned int pc, unsigned int target_addr, bool jump_);
   void refreshStage();
