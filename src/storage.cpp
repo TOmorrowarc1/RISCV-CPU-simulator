@@ -42,16 +42,17 @@ void StatusRegister::refresh() {
   }
 }
 
-StatusRegister IF_ID_reg_ins;      // for instruction
-StatusRegister IF_ID_reg_pc;       // for PC count
-StatusRegister IF_ID_reg_has_jump; // for jump or not
-StatusRegister ID_IF_reg_stall;    // for hazard
+StatusRegister IF_ID_reg_ins; // for instruction
+StatusRegister IF_ID_reg_pc;  // for PC count
 
 StatusRegister ID_EX_reg_1; // for register1
 StatusRegister ID_EX_reg_2; // for register2
 
-StatusRegister EXE_MEM_reg_alu;   // for the oprand of next stages
-StatusRegister EXE_MEM_reg_reg2;  // for register2 which may store
-StatusRegister EXE_IF_reg_branch; // for possible branch miss
+StatusRegister EXE_MEM_reg_alu;    // for the oprand of next stages
+StatusRegister EXE_MEM_reg_reg2;   // for register2 which may store
+StatusRegister EXE_IF_reg_branch;  // for possible branch miss
+StatusRegister EXE_IF_reg_pc;      // for BPU refresh: the pc.
+StatusRegister EXE_IF_reg_target;  // for BPU refresh: is_branch & target_addr.
+StatusRegister EXE_IF_reg_if_jump; // for BPU refresh: if_jump.
 
 StatusRegister MEM_WB_reg_1; // for result need be written back
