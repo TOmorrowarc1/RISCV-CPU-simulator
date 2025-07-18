@@ -12,5 +12,6 @@ void StageID();
 void StageEXE();
 void StageMEM();
 void StageWB();
+void refreshStage();
 
 #endif

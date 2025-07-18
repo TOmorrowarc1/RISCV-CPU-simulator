@@ -59,3 +59,5 @@ StatusRegister EXE_IF_reg_target;  // for BPU refresh: is_branch & target_addr.
 StatusRegister EXE_IF_reg_if_jump; // for BPU refresh: if_jump.
 
 StatusRegister MEM_WB_reg_1; // for result need be written back
+
+bool Stop = false;

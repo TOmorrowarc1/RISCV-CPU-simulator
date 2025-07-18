@@ -63,4 +63,6 @@ extern StatusRegister EXE_IF_reg_if_jump;     // for BPU refresh.
 
 extern StatusRegister MEM_WB_reg_1; // for result need be written back
 
+extern bool Stop;
+
 #endif

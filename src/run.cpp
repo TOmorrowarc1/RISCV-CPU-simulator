@@ -108,3 +108,19 @@ void StageWB() {
     RegisterGroup::getInstance().write(wb_control.rd, data);
   }
 }
+
+void refreshStage() {
+  IF_ID_reg_ins.refresh();
+  IF_ID_reg_pc.refresh();
+  ID_EX_reg_1.refresh();
+  ID_EX_reg_2.refresh();
+  EXE_MEM_reg_alu.refresh();
+  EXE_MEM_reg_reg2.refresh();
+  EXE_IF_reg_branch.refresh();
+  EXE_IF_reg_if_jump.refresh();
+  EXE_IF_reg_pc.refresh();
+  EXE_IF_reg_target_addr.refresh();
+  MEM_WB_reg_1.refresh();
+  ProgramCounter::getInstance().refreshStage();
+  InsBoard::getInstance().refreshStage();
+}
