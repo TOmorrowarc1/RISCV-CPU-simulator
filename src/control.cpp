@@ -1,9 +1,7 @@
 #include "control.hpp"
-#include "storage.hpp"
 #include <cassert>
 
-Control::AllControlInfo InsBoard::parse(unsigned int command, unsigned int pc,
-                                        bool has_jump) {
+Control::AllControlInfo InsBoard::parse(unsigned int command, unsigned int pc) {
   Control::AllControlInfo result;
   result.exe_control.pc = pc;
   unsigned int opcode = command & 0x7f;
@@ -141,19 +139,15 @@ Control::AllControlInfo InsBoard::parse(unsigned int command, unsigned int pc,
     break;
   }
   case 0x67: {
-    // for type 'I': JALR- pc=reg1+imm, rd=pc+4
+    // for type 'I': JALR- pc=reg1+imm, rd=pc+4, black sheep No.2.
     result.reg_control.register1 = (command >> 15) & 0x1f;
     result.exe_control.signResultPC = true;
     result.exe_control.signImmediate = true;
     result.exe_control.immdiate = int(command) >> 20;
+    result.exe_control.branch_addr = -1; // just for jalr.
     result.wb_control.allow = true;
     result.wb_control.rd = (command >> 7) & 0x1f;
     unsigned int func3_ = (command >> 12) & 0x7;
-    if (func3_ == 0x0) {
-      result.exe_control.jump = Control::EXEControlInfo::JumpType::JALR;
-    } else {
-      assert(false);
-    }
     break;
   }
   case 0x23: {
@@ -183,12 +177,10 @@ Control::AllControlInfo InsBoard::parse(unsigned int command, unsigned int pc,
     break;
   }
   case 0x63: {
-    // for type 'B': conditional branch: examine the prediction and write back
-    // the possible result, which stores in the "pc" of ins.
+    /* for type 'B': conditional branch: examine the prediction and write back
+    the possible result, which stores in the "pc" of ins.*/
     result.reg_control.register1 = (command >> 15) & 0x1f;
     result.reg_control.register2 = (command >> 20) & 0x1f;
-    result.exe_control.jump = has_jump ? Control::EXEControlInfo::JumpType::BYES
-                                       : Control::EXEControlInfo::JumpType::BNO;
     result.exe_control.immdiate =
         int(((((command >> 7) & 0x1) << 11) | (((command >> 8) & 0xf) << 1) |
              (((command >> 25) & 0x3f) << 5) | (((command >> 31) & 0x1) << 12))
@@ -240,8 +232,8 @@ Control::AllControlInfo InsBoard::parse(unsigned int command, unsigned int pc,
     break;
   }
   case 0x6f: {
-    // for type 'J': JAL: just write the rd.
-    // if jump is confirmed by the pc(not 0).
+    /* for type 'J': JAL: just write the rd.
+    if jump is confirmed by the pc(not 0).*/
     result.exe_control.signResultPC = true;
     result.wb_control.allow = true;
     result.wb_control.rd = (command >> 7) & 0x1f;
@@ -273,14 +265,13 @@ InsBoard &InsBoard::getInstance() {
   return instance;
 }
 
-Control::RegControlInfo InsBoard::IR(unsigned int command, unsigned int pc,
-                                     bool has_jump) {
+Control::RegControlInfo InsBoard::IR(unsigned int command, unsigned int pc) {
   /*
   First interpret the instruction, then compare the result with signals in EXE
   and LS for forwarding. After all signals prepared well, launch them onto
   board.
   */
-  Control::AllControlInfo control_signals = parse(command, pc, has_jump);
+  Control::AllControlInfo control_signals = parse(command, pc);
   int register1 = control_signals.reg_control.register1;
   int register2 = control_signals.reg_control.register2;
   Control::WBControlInfo exe_write_back;
@@ -371,18 +362,20 @@ void InsBoard::refreshStage() {
 
 void ProgramCounter::setAllow(bool sign) { pc_.setAllow(sign); }
 
-unsigned int ProgramCounter::getCommand() { return memory_[pc_.read()]; }
-
-unsigned int ProgramCounter::getNextAddress(unsigned int branch) {
+// all works in IF: get command, address & select next addr.
+std::pair<unsigned int, unsigned int>
+ProgramCounter::judge(unsigned int branch) {
   if (branch != 0) {
-    return branch;
+    return std::pair<unsigned int, unsigned int>(memory_[branch], branch);
   }
   unsigned int address = pc_.read();
   unsigned int branch_addr = branchPredict(address);
   if (branch_addr != 0) {
-    return branch_addr;
+    pc_.write(branch_addr);
+  } else {
+    pc_.write(address + 4);
   }
-  return address;
+  return std::pair<unsigned int, unsigned int>(memory_[address], address);
 }
 
 unsigned int ProgramCounter::branchPredict(unsigned int address) {

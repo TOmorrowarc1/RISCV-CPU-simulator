@@ -1,6 +1,7 @@
 #ifndef CONTROL_HPP
 #define CONTROL_HPP
 #include "mySTL.hpp"
+#include "storage.hpp"
 #include <mutex>
 #include <shared_mutex>
 #include <unordered_map>
@@ -60,10 +61,8 @@ struct EXEControlInfo {
     AND,
     PRINTIMM
   };
-  enum class JumpType { BYES, BNO, JALR, NOP };
   CalcType type = CalcType::ADD;
   int immdiate = 0;
-  JumpType jump = JumpType::NOP;
   int pc = 0;
   int branch_addr = 0;
   int signForward1 = 0;
@@ -104,10 +103,8 @@ private:
 
 public:
   static InsBoard &getInstance();
-  Control::RegControlInfo IR(unsigned int command, unsigned int pc,
-                             bool has_jump);
-  Control::AllControlInfo parse(unsigned int command, unsigned int pc,
-                                bool has_jump);
+  Control::RegControlInfo IR(unsigned int command, unsigned int pc);
+  Control::AllControlInfo parse(unsigned int command, unsigned int pc);
   void injectBubble();
   void stallPipeLine();
   void flushPipeLine();
@@ -129,11 +126,12 @@ private:
 
 public:
   static ProgramCounter &getInstance();
+
   void setAllow(bool sign);
-  unsigned int getCommand();
-  unsigned int getNextAddress(unsigned int branch);
   unsigned int branchPredict(unsigned int address);
   void refreshBranch(unsigned int pc, unsigned int target_addr, bool jump_);
+
+  std::pair<unsigned int, unsigned int> judge(unsigned int branch);
   void refreshStage();
 };
 
