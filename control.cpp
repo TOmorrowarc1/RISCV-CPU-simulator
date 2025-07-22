@@ -235,6 +235,7 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
         11;
     result.predict_taken = true;
     result.predict_target_addr = result.pc + immdiate;
+    break;
   }
   default: {
     throw std::exception();
