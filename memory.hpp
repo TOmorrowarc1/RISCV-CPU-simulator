@@ -16,9 +16,6 @@ private:
     if (storage == nullptr || address + size > MEMSIZE) {
       throw std::runtime_error("Memory access out of bounds!");
     }
-    if (address % size != 0) {
-      throw std::runtime_error("Misaligned memory access!");
-    }
   }
 
 public:
