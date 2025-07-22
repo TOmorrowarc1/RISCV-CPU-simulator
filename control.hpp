@@ -18,54 +18,63 @@ J-type:
   JAL;
 */
 namespace Control {
+enum class InsType { CALC, LOAD, STORE, BRANCH };
+enum class CalcType { ADD, SUB, SLL, LT, LTU, SRL, SRA, XOR, OR, AND, IMM };
+enum class MemType { BYTE, HALF, WORD };
+enum class BranchType { JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU };
 
+/*For decoder.*/
 struct ControlInfo {
   /*Info used by more than one executor.*/
-  enum class InsType { CALC, LOAD, STORE, BRANCH };
   InsType type;
   uint32_t register1 = 0;
   uint32_t register2 = 0;
   uint32_t immdiate = 0;
   uint32_t pc = 0;
-
   uint32_t rd = 0;
   bool allow = false;
 
   /*Info used by alu, which will be shaped into ALUControl in stage of issue.*/
-  enum class CalcType {
-    ADD,
-    SUB,
-    SLL,
-    LT,
-    GE,
-    LTU,
-    GEU,
-    EQ,
-    NE,
-    SRL,
-    SRA,
-    XOR,
-    OR,
-    AND,
-    IMM
-  };
   CalcType calcType = CalcType::ADD;
   bool signPC = false;
   bool signImmediate = false;
 
   /*Info used by mem, grow into MemControl.*/
-  enum class MemType { BYTE, HALF, WORD };
   MemType size = MemType::WORD;
-  bool extend_sign = false;
+  bool signExtend = false;
 
   /*Info used by branch, grow into BranchControl.*/
-  enum class BranchType { JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU };
   BranchType branchType = BranchType::JAL;
   uint32_t predict_target_addr = 0;
   bool predict_taken = 0;
 };
 
 ControlInfo parse(uint32_t command, uint32_t pc);
+
+/*For Dispatcher and info in each RS/need by different type ins.*/
+struct AluControlInfo {
+  CalcType type;
+  uint32_t oprand_1;
+  uint32_t oprand_2;
+};
+
+struct MemControlInfo {
+  InsType type;
+  MemType size;
+  uint32_t immdiate;
+  uint32_t oprand1;
+  uint32_t oprand2;
+  bool signExtend;
+};
+
+struct BranchControlInfo {
+  BranchType type;
+  uint32_t oprand1;
+  uint32_t oprand2;
+  uint32_t immdiate;
+  uint32_t pc;
+};
+
 }; // namespace Control
 
 #endif

@@ -11,46 +11,46 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
   switch (opcode) {
   case 0x33: {
     // For type 'R': record two target arch regs and the target reg.
-    result.type = Control::ControlInfo::InsType::CALC;
+    result.type = Control::InsType::CALC;
     result.allow = true;
     uint32_t func3_ = (command >> 12) & 0x7;
     uint32_t func7_ = (command >> 25) & 0x7f;
     switch (func3_) {
     case 0x0:
       if (func7_ == 0x00) {
-        result.calcType = Control::ControlInfo::CalcType::ADD;
+        result.calcType = Control::CalcType::ADD;
       } else if (func7_ == 0x20) {
-        result.calcType = Control::ControlInfo::CalcType::SUB;
+        result.calcType = Control::CalcType::SUB;
       } else {
         throw std::exception();
       }
       break;
     case 0x1:
-      result.calcType = Control::ControlInfo::CalcType::SLL;
+      result.calcType = Control::CalcType::SLL;
       break;
     case 0x2:
-      result.calcType = Control::ControlInfo::CalcType::LT;
+      result.calcType = Control::CalcType::LT;
       break;
     case 0x3:
-      result.calcType = Control::ControlInfo::CalcType::LTU;
+      result.calcType = Control::CalcType::LTU;
       break;
     case 0x4:
-      result.calcType = Control::ControlInfo::CalcType::XOR;
+      result.calcType = Control::CalcType::XOR;
       break;
     case 0x5:
       if (func7_ == 0x00) {
-        result.calcType = Control::ControlInfo::CalcType::SRL;
+        result.calcType = Control::CalcType::SRL;
       } else if (func7_ == 0x20) {
-        result.calcType = Control::ControlInfo::CalcType::SRA;
+        result.calcType = Control::CalcType::SRA;
       } else {
         throw std::exception();
       }
       break;
     case 0x6:
-      result.calcType = Control::ControlInfo::CalcType::OR;
+      result.calcType = Control::CalcType::OR;
       break;
     case 0x7:
-      result.calcType = Control::ControlInfo::CalcType::AND;
+      result.calcType = Control::CalcType::AND;
       break;
     default:
       throw std::exception();
@@ -59,7 +59,7 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
   }
   case 0x13: {
     // for type 'I': immediate calculation.
-    result.type = Control::ControlInfo::InsType::CALC;
+    result.type = Control::InsType::CALC;
     result.signImmediate = true;
     result.immdiate = int(command) >> 20;
     result.allow = true;
@@ -67,36 +67,36 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
     uint32_t func7_ = (command >> 25) & 0x7f;
     switch (func3_) {
     case 0x0:
-      result.calcType = Control::ControlInfo::CalcType::ADD;
+      result.calcType = Control::CalcType::ADD;
       break;
     case 0x1:
-      result.calcType = Control::ControlInfo::CalcType::SLL;
+      result.calcType = Control::CalcType::SLL;
       break;
     case 0x2:
-      result.calcType = Control::ControlInfo::CalcType::LT;
+      result.calcType = Control::CalcType::LT;
       break;
     case 0x3:
-      result.calcType = Control::ControlInfo::CalcType::LTU;
+      result.calcType = Control::CalcType::LTU;
       break;
     case 0x4:
-      result.calcType = Control::ControlInfo::CalcType::XOR;
+      result.calcType = Control::CalcType::XOR;
       break;
     case 0x5:
       func7_ = (command >> 27) & 0x1f;
       result.immdiate = result.immdiate & 0x1f;
       if (func7_ == 0x0) {
-        result.calcType = Control::ControlInfo::CalcType::SRL;
+        result.calcType = Control::CalcType::SRL;
       } else if (func7_ == 0x8) {
-        result.calcType = Control::ControlInfo::CalcType::SRA;
+        result.calcType = Control::CalcType::SRA;
       } else {
         throw std::exception();
       }
       break;
     case 0x6:
-      result.calcType = Control::ControlInfo::CalcType::OR;
+      result.calcType = Control::CalcType::OR;
       break;
     case 0x7:
-      result.calcType = Control::ControlInfo::CalcType::AND;
+      result.calcType = Control::CalcType::AND;
       break;
     default:
       throw std::exception();
@@ -105,31 +105,31 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
   }
   case 0x3: {
     // for type 'I': load reg2 into reg1+imm.
-    result.type = Control::ControlInfo::InsType::LOAD;
+    result.type = Control::InsType::LOAD;
     result.immdiate = int(command) >> 20;
     result.allow = true;
     result.rd = (command >> 7) & 0x1f;
     uint32_t func3_ = (command >> 12) & 0x7;
     switch (func3_) {
     case 0x0:
-      result.size = Control::ControlInfo::MemType::BYTE;
-      result.extend_sign = true;
+      result.size = Control::MemType::BYTE;
+      result.signExtend = true;
       break;
     case 0x1:
-      result.size = Control::ControlInfo::MemType::HALF;
-      result.extend_sign = true;
+      result.size = Control::MemType::HALF;
+      result.signExtend = true;
       break;
     case 0x2:
-      result.size = Control::ControlInfo::MemType::WORD;
-      result.extend_sign = true;
+      result.size = Control::MemType::WORD;
+      result.signExtend = true;
       break;
     case 0x4:
-      result.size = Control::ControlInfo::MemType::BYTE;
-      result.extend_sign = false;
+      result.size = Control::MemType::BYTE;
+      result.signExtend = false;
       break;
     case 0x5:
-      result.size = Control::ControlInfo::MemType::HALF;
-      result.extend_sign = false;
+      result.size = Control::MemType::HALF;
+      result.signExtend = false;
       break;
     default:
       throw std::exception();
@@ -138,15 +138,15 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
   }
   case 0x67: {
     // for type 'I': (JALR) pc=reg1+imm, rd=pc+4, black sheep No.2.
-    result.type = Control::ControlInfo::InsType::BRANCH;
-    result.branchType = Control::ControlInfo::BranchType::JALR;
+    result.type = Control::InsType::BRANCH;
+    result.branchType = Control::BranchType::JALR;
     result.immdiate = int(command) >> 20;
     result.allow = true;
     break;
   }
   case 0x23: {
     // for type 'S': store reg2 into reg1+imm;
-    result.type = Control::ControlInfo::InsType::STORE;
+    result.type = Control::InsType::STORE;
     result.immdiate =
         int(((((command >> 25) & 0x7f) << 5) | ((command >> 7) & 0x1f))
             << 20) >>
@@ -154,13 +154,13 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
     uint32_t func3_ = (command >> 12) & 0x7;
     switch (func3_) {
     case 0x0:
-      result.size = Control::ControlInfo::MemType::BYTE;
+      result.size = Control::MemType::BYTE;
       break;
     case 0x1:
-      result.size = Control::ControlInfo::MemType::HALF;
+      result.size = Control::MemType::HALF;
       break;
     case 0x2:
-      result.size = Control::ControlInfo::MemType::WORD;
+      result.size = Control::MemType::WORD;
       break;
     default:
       throw std::exception();
@@ -169,7 +169,7 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
   }
   case 0x63: {
     /* for type 'B': conditional branch: examine the prediction.*/
-    result.type = Control::ControlInfo::InsType::BRANCH;
+    result.type = Control::InsType::BRANCH;
     result.immdiate =
         int(((((command >> 7) & 0x1) << 11) | (((command >> 8) & 0xf) << 1) |
              (((command >> 25) & 0x3f) << 5) | (((command >> 31) & 0x1) << 12))
@@ -178,22 +178,22 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
     uint32_t func3_ = (command >> 12) & 0x7;
     switch (func3_) {
     case 0x0:
-      result.branchType = Control::ControlInfo::BranchType::BEQ;
+      result.branchType = Control::BranchType::BEQ;
       break;
     case 0x1:
-      result.branchType = Control::ControlInfo::BranchType::BNE;
+      result.branchType = Control::BranchType::BNE;
       break;
     case 0x4:
-      result.branchType = Control::ControlInfo::BranchType::BLT;
+      result.branchType = Control::BranchType::BLT;
       break;
     case 0x5:
-      result.branchType = Control::ControlInfo::BranchType::BGE;
+      result.branchType = Control::BranchType::BGE;
       break;
     case 0x6:
-      result.branchType = Control::ControlInfo::BranchType::BLTU;
+      result.branchType = Control::BranchType::BLTU;
       break;
     case 0x7:
-      result.branchType = Control::ControlInfo::BranchType::BGEU;
+      result.branchType = Control::BranchType::BGEU;
       break;
     default:
       throw std::exception();
@@ -202,8 +202,8 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
   }
   case 0x37: {
     // for type 'U': LUI ins-ALU do nothing.
-    result.type = Control::ControlInfo::InsType::CALC;
-    result.calcType = Control::ControlInfo::CalcType::IMM;
+    result.type = Control::InsType::CALC;
+    result.calcType = Control::CalcType::IMM;
     result.signImmediate = true;
     result.immdiate = int(command & 0xfffff000) << 12;
     result.allow = true;
@@ -211,8 +211,8 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
   }
   case 0x17: {
     // for type 'U': (AUIPC) rd=PC+imm.
-    result.type = Control::ControlInfo::InsType::CALC;
-    result.calcType = Control::ControlInfo::CalcType::ADD;
+    result.type = Control::InsType::CALC;
+    result.calcType = Control::CalcType::ADD;
     result.signPC = true;
     result.signImmediate = true;
     result.immdiate = int(command & 0xfffff000) << 12;
@@ -221,8 +221,8 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
   }
   case 0x6f: {
     /* for type 'J': JAL: just write the rd.*/
-    result.type = Control::ControlInfo::InsType::BRANCH;
-    result.branchType = Control::ControlInfo::BranchType::JAL;
+    result.type = Control::InsType::BRANCH;
+    result.branchType = Control::BranchType::JAL;
     result.allow = true;
     uint32_t immdiate =
         int(((((command >> 12) & 0xff) << 12) |
