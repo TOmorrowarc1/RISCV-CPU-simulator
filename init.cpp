@@ -22,7 +22,10 @@ bool loadMemory(const std::string &filename, uint32_t *memory, uint32_t size) {
         return false;
       }
     } else {
-      while (lineStream >> std::hex >> byteValue) {
+      while (lineStream) {
+        uint32_t a, b, c, d, result;
+        lineStream >> a >> b >> c >> d;
+        result = (a << 24) | (b << 16) | (c << 8) | d;
         if (currentAddress >= size) {
           std::cerr << "error: visit memory out bound\n";
           return false;

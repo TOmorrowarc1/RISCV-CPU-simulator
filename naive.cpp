@@ -2,8 +2,9 @@
 #include "init.hpp"
 #include <iostream>
 
-std::string fileName;
+std::string fileName = "sample/sample.data";
 const int MEMSIZE = 10000;
+bool flag = true;
 
 uint32_t clk = 0;
 uint32_t pc = 0;
@@ -23,7 +24,7 @@ int main() {
   if (!loadMemory(fileName, memory, MEMSIZE)) {
     throw std::exception();
   };
-  while (true) {
+  while (flag) {
     ++clk;
     StageIF();
     StageIssue();
@@ -45,6 +46,11 @@ void StageIssue() {
 
 void StageExecute() {
   // Dispatch and execute.
+  if (controlInfo.type == Control::InsType::END) {
+    std::cout << registers[controlInfo.register1];
+    flag = false;
+    return;
+  }
   if (controlInfo.type == Control::InsType::CALC) {
     Control::AluControlInfo aluInfo;
     aluInfo.type = controlInfo.calcType;

@@ -68,6 +68,9 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
     switch (func3_) {
     case 0x0:
       result.calcType = Control::CalcType::ADD;
+      if (result.immdiate == 255) {
+        result.type = Control::InsType::END;
+      }
       break;
     case 0x1:
       result.calcType = Control::CalcType::SLL;

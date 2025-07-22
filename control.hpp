@@ -18,7 +18,7 @@ J-type:
   JAL;
 */
 namespace Control {
-enum class InsType { CALC, LOAD, STORE, BRANCH };
+enum class InsType { CALC, LOAD, STORE, BRANCH, END };
 enum class CalcType { ADD, SUB, SLL, LT, LTU, SRL, SRA, XOR, OR, AND, IMM };
 enum class MemType { BYTE, HALF, WORD };
 enum class BranchType { JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU };
