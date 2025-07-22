@@ -4,8 +4,7 @@
 #include <iostream>
 
 extern std::byte memory[MEMSIZE];
-std::string fileName =
-    "/home/tomorrow_arc1/CS/RISCV-CPU-stimulation/sample/sample.data";
+std::string fileName = "/home/tomorrow_arc1/CS/RISCV-CPU-stimulation/testcases/pi.data";
 bool flag = true;
 
 uint32_t clk = 0;
