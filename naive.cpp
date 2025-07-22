@@ -1,15 +1,16 @@
 #include "control.hpp"
 #include "init.hpp"
+#include "memory.hpp"
 #include <iostream>
 
+extern std::byte memory[MEMSIZE];
 std::string fileName = "sample/sample.data";
-const int MEMSIZE = 10000;
 bool flag = true;
 
 uint32_t clk = 0;
 uint32_t pc = 0;
 uint32_t registers[32] = {0};
-uint32_t memory[MEMSIZE] = {0};
+
 uint32_t Fetch_Issue_ins = 0;
 uint32_t Fetch_Issue_pc = 0;
 Control::ControlInfo controlInfo;
@@ -21,7 +22,7 @@ void StageExecute();
 void StageCommit();
 
 int main() {
-  if (!loadMemory(fileName, memory, MEMSIZE)) {
+  if (!loadMemory(fileName)) {
     throw std::exception();
   };
   while (flag) {
@@ -34,7 +35,7 @@ int main() {
 }
 
 void StageIF() {
-  Fetch_Issue_ins = memory[pc];
+  Fetch_Issue_ins = Memory::getInstance().load(pc, Memory::Size::WORD);
   Fetch_Issue_pc = pc;
   pc += 4;
 }
@@ -152,7 +153,8 @@ void StageExecute() {
     memInfo.oprand2 = registers[controlInfo.register2];
     memInfo.immdiate = controlInfo.immdiate;
     if (memInfo.type == Control::InsType::LOAD) {
-      uint32_t result = memory[memInfo.oprand1 + memInfo.immdiate];
+      uint32_t result = Memory::getInstance().load(
+          memInfo.oprand1 + memInfo.immdiate, Memory::Size::WORD);
       int origin_bits;
       switch (memInfo.size) {
       case Control::MemType::BYTE:
@@ -175,21 +177,22 @@ void StageExecute() {
       }
       Execute_result = result;
     } else {
-      uint32_t data;
+      Memory::Size size;
       switch (memInfo.size) {
       case Control::MemType::BYTE:
-        data = memInfo.oprand2 & 0xff;
+        size = Memory::Size::BYTE;
         break;
       case Control::MemType::HALF:
-        data = memInfo.oprand2 & 0xffff;
+        size = Memory::Size::HALF;
         break;
       case Control::MemType::WORD:
-        data = memInfo.oprand2;
+        size = Memory::Size::WORD;
         break;
       default:
         throw std::exception();
       }
-      memory[memInfo.oprand1 + memInfo.immdiate] = data;
+      Memory::getInstance().store(memInfo.oprand1 + memInfo.immdiate, size,
+                                  memInfo.oprand2);
     }
   }
 }

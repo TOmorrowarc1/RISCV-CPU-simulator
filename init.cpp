@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stdint.h>
 
-bool loadMemory(const std::string &filename, uint32_t *memory, uint32_t size) {
+bool loadMemory(const std::string &filename) {
   std::fstream input(filename);
   if (!input.is_open()) {
     std::cerr << "error: failed to open the file\n";
@@ -12,7 +12,7 @@ bool loadMemory(const std::string &filename, uint32_t *memory, uint32_t size) {
   }
   size_t currentAddress = 0;
   std::string line;
-  uint32_t byteValue;
+  uint32_t data;
   while (std::getline(input, line)) {
     std::stringstream lineStream(line);
     if (line[0] == '@') {
@@ -22,15 +22,8 @@ bool loadMemory(const std::string &filename, uint32_t *memory, uint32_t size) {
         return false;
       }
     } else {
-      while (lineStream) {
-        uint32_t a, b, c, d, result;
-        lineStream >> a >> b >> c >> d;
-        result = (a << 24) | (b << 16) | (c << 8) | d;
-        if (currentAddress >= size) {
-          std::cerr << "error: visit memory out bound\n";
-          return false;
-        }
-        memory[currentAddress] = byteValue;
+      while (lineStream >> std::hex >> data) {
+        Memory::getInstance().store(currentAddress, Memory::Size::BYTE, data);
         ++currentAddress;
       }
     }
