@@ -240,4 +240,5 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
     throw std::exception();
   }
   }
+  return result;
 }
