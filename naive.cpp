@@ -4,7 +4,8 @@
 #include <iostream>
 
 extern std::byte memory[MEMSIZE];
-std::string fileName = "/home/tomorrow_arc1/CS/RISCV-CPU-stimulation/sample/sample.data";
+std::string fileName =
+    "/home/tomorrow_arc1/CS/RISCV-CPU-stimulation/sample/sample.data";
 bool flag = true;
 
 uint32_t clk = 0;
@@ -48,7 +49,7 @@ void StageIssue() {
 void StageExecute() {
   // Dispatch and execute.
   if (controlInfo.type == Control::InsType::END) {
-    std::cout << registers[controlInfo.register1];
+    std::cout << (registers[controlInfo.rd] & 0xff);
     flag = false;
     return;
   }
@@ -201,4 +202,5 @@ void StageCommit() {
   if (controlInfo.allow) {
     registers[controlInfo.rd] = Execute_result;
   }
+  registers[0] = 0;
 }
