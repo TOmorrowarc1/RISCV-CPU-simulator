@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <stdint.h>
 
-const int MEMSIZE = 65536;
+const int MEMSIZE = 4194304; // 4 MB
 
 class Memory {
 private:
