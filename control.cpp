@@ -205,7 +205,7 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
     result.type = Control::InsType::CALC;
     result.calcType = Control::CalcType::IMM;
     result.signImmediate = true;
-    result.immdiate = int(command & 0xfffff000) << 12;
+    result.immdiate = command & 0xfffff000 << 12;
     result.allow = true;
     break;
   }
@@ -215,7 +215,7 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
     result.calcType = Control::CalcType::ADD;
     result.signPC = true;
     result.signImmediate = true;
-    result.immdiate = int(command & 0xfffff000) << 12;
+    result.immdiate = command & 0xfffff000 << 12;
     result.allow = true;
     break;
   }
