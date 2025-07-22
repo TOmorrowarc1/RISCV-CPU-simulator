@@ -22,7 +22,7 @@ bool loadMemory(const std::string &filename) {
       }
     } else {
       while (lineStream >> std::hex >> data) {
-        Memory::getInstance().store(currentAddress, Memory::Size::BYTE, data);
+        Memory::getInstance().store(currentAddress, 1, data);
         ++currentAddress;
       }
     }

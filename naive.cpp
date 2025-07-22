@@ -35,7 +35,7 @@ int main() {
 }
 
 void StageIF() {
-  Fetch_Issue_ins = Memory::getInstance().load(pc, Memory::Size::WORD);
+  Fetch_Issue_ins = Memory::getInstance().load(pc, 4);
   Fetch_Issue_pc = pc;
   pc += 4;
 }
@@ -153,8 +153,8 @@ void StageExecute() {
     memInfo.oprand2 = registers[controlInfo.register2];
     memInfo.immdiate = controlInfo.immdiate;
     if (memInfo.type == Control::InsType::LOAD) {
-      uint32_t result = Memory::getInstance().load(
-          memInfo.oprand1 + memInfo.immdiate, Memory::Size::WORD);
+      uint32_t result =
+          Memory::getInstance().load(memInfo.oprand1 + memInfo.immdiate, 4);
       int origin_bits;
       switch (memInfo.size) {
       case Control::MemType::BYTE:
@@ -177,16 +177,16 @@ void StageExecute() {
       }
       Execute_result = result;
     } else {
-      Memory::Size size;
+      uint32_t size;
       switch (memInfo.size) {
       case Control::MemType::BYTE:
-        size = Memory::Size::BYTE;
+        size = 1;
         break;
       case Control::MemType::HALF:
-        size = Memory::Size::HALF;
+        size = 2;
         break;
       case Control::MemType::WORD:
-        size = Memory::Size::WORD;
+        size = 4;
         break;
       default:
         throw std::exception();

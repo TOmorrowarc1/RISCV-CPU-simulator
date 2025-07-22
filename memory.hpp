@@ -8,9 +8,6 @@
 const int MEMSIZE = 4096;
 
 class Memory {
-public:
-  enum Size { BYTE=1, HALF=2, WORD=4};
-
 private:
   std::byte storage[MEMSIZE];
   Memory() { std::memset(storage, 0, MEMSIZE); }
@@ -26,7 +23,7 @@ private:
 
 public:
   static Memory &getInstance();
-  uint32_t load(uint32_t address, Size size);
-  void store(uint32_t address, Size size, uint32_t data);
+  uint32_t load(uint32_t address, uint32_t size);
+  void store(uint32_t address, uint32_t size, uint32_t data);
 };
 #endif
