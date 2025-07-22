@@ -1,4 +1,6 @@
-#include<iostream>
-#include<fstream>
+#ifndef INIT_HPP
+#define INIT_HPP
 
-void Init();
+bool loadMemory(const std::string &filename, uint32_t *memory, uint32_t size);
+
+#endif

@@ -2,7 +2,9 @@
 #include "init.hpp"
 #include <iostream>
 
+std::string fileName;
 const int MEMSIZE = 10000;
+
 uint32_t clk = 0;
 uint32_t pc = 0;
 uint32_t registers[32] = {0};
@@ -18,7 +20,9 @@ void StageExecute();
 void StageCommit();
 
 int main() {
-  Init();
+  if (!loadMemory(fileName, memory, MEMSIZE)) {
+    throw std::exception();
+  };
   while (true) {
     ++clk;
     StageIF();
