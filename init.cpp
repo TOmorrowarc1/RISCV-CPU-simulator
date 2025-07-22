@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <stdint.h>
 
 bool loadMemory(const std::string &filename) {
   std::fstream input(filename);

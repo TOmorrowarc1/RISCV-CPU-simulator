@@ -10,5 +10,6 @@ set(SOURCES
     control.cpp 
     init.cpp
     naive.cpp
+    memory.cpp
 )
 add_executable(code ${SOURCES})
