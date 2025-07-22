@@ -85,11 +85,10 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
       result.calcType = Control::CalcType::XOR;
       break;
     case 0x5:
-      func7_ = (command >> 27) & 0x1f;
       result.immdiate = result.immdiate & 0x1f;
-      if (func7_ == 0x0) {
+      if (func7_ == 0x00) {
         result.calcType = Control::CalcType::SRL;
-      } else if (func7_ == 0x8) {
+      } else if (func7_ == 0x20) {
         result.calcType = Control::CalcType::SRA;
       } else {
         throw std::exception();
@@ -208,7 +207,7 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
     result.type = Control::InsType::CALC;
     result.calcType = Control::CalcType::IMM;
     result.signImmediate = true;
-    result.immdiate = command & 0xfffff000 << 12;
+    result.immdiate = command & 0xfffff000;
     result.allow = true;
     break;
   }
@@ -218,7 +217,7 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
     result.calcType = Control::CalcType::ADD;
     result.signPC = true;
     result.signImmediate = true;
-    result.immdiate = command & 0xfffff000 << 12;
+    result.immdiate = command & 0xfffff000;
     result.allow = true;
     break;
   }
@@ -227,14 +226,14 @@ Control::ControlInfo Control::parse(uint32_t command, uint32_t pc) {
     result.type = Control::InsType::BRANCH;
     result.branchType = Control::BranchType::JAL;
     result.allow = true;
-    uint32_t immdiate =
+    result.immdiate =
         int(((((command >> 12) & 0xff) << 12) |
              (((command >> 20) & 0x1) << 11) |
              (((command >> 21) & 0x3ff) << 1) | (((command >> 31) & 1) << 20))
             << 11) >>
         11;
     result.predict_taken = true;
-    result.predict_target_addr = result.pc + immdiate;
+    result.predict_target_addr = result.pc + result.immdiate;
     break;
   }
   default: {
