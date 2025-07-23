@@ -2,7 +2,14 @@
 
 ROB::ROB() : head_(0), tail_(0) {}
 
-bool ROB::empty() { return head_.getValue() == tail_.getValue(); }
+bool ROB::empty() {
+  return head_.getValue() == tail_.getValue() &&
+         !storage[head_.getValue()].busy.getValue();
+}
+bool ROB::full() {
+  return head_.getValue() == tail_.getValue() &&
+         storage[head_.getValue()].busy.getValue();
+}
 
 uint32_t ROB::next(uint32_t now) { return now + 1 == ROBSIZE ? 0 : now + 1; }
 
@@ -43,7 +50,15 @@ ROBCommitInfo ROB::tryCommit() {
   if (!empty() && storage[head_now].state.getValue()) {
     answer.rd = storage[head_now].rd;
     answer.value = storage[head_now].result;
+    storage[head_now].busy.writeValue(false);
     head_.writeValue(next(head_now));
   }
   return answer;
+}
+
+void ROB::refresh() {
+  for (int i = 0; i < ROBSIZE; ++i) {
+    storage[i].busy.refresh();
+    storage[i].state.refresh();
+  }
 }

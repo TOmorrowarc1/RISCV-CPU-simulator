@@ -16,6 +16,7 @@ struct ROBItem {
   uint32_t result = 0;
   uint32_t predict_branch = 0;
   buffer<bool> state = buffer<bool>(false);
+  buffer<bool> busy = buffer<bool>(false);
   bool predict_taken = false;
 };
 
@@ -27,6 +28,7 @@ private:
 
   ROB();
   bool empty();
+  bool full();
   uint32_t next(uint32_t now);
 
 public:
@@ -35,6 +37,7 @@ public:
   BusyValue getOperand(uint32_t index);
   ROBCommitInfo tryCommit();
   void listenCDB(BoardCastInfo info);
+  void refresh();
 };
 
 #endif
