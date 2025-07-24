@@ -7,6 +7,7 @@ const int ROBSIZE = 50;
 // Items store in ROB, the "state" records if it is complete.
 struct ROBItem {
   uint32_t rd = 0;
+  uint32_t origin_index = 0;
   uint32_t result = 0;
   uint32_t predict_branch = 0;
   buffer<bool> state = buffer<bool>(false);
@@ -29,7 +30,7 @@ private:
 public:
   static ROB &getInstance();
   uint32_t getTail();
-  uint32_t newIns(ROBItem info);
+  uint32_t newIns(ROBInsInfo info);
   BusyValue getOperand(uint32_t index);
   ROBCommitInfo tryCommit();
   void listenCDB(BoardCastInfo info);

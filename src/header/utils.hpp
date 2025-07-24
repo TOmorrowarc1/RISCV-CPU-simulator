@@ -21,12 +21,6 @@ struct BusyValue {
   bool busy = false;
 };
 
-struct BoardCastInfo {
-  uint32_t index;
-  uint32_t value;
-  bool flag;
-};
-
 struct BasicInsInfo {
   uint32_t command;
   uint32_t ins_pc;
@@ -67,9 +61,41 @@ struct DecodeInsInfo {
   bool predict_taken = 0;
 };
 
-struct ExeALUInsInfo;
-struct ExeBUInsInfo;
-struct ExeLSBInsInfo;
+struct ALUInfo {
+  CalcType type = CalcType::ADD;
+  uint32_t oprand1 = 0;
+  uint32_t oprand2 = 0;
+};
+
+struct BUInfo {
+  BranchType type = BranchType::BEQ;
+  uint32_t oprand1 = 0;
+  uint32_t oprand2 = 0;
+  uint32_t immdiate;
+  uint32_t pc;
+};
+
+struct LSBInfo {
+  InsType type;
+  MemType size;
+  uint32_t immdiate;
+  uint32_t oprand1;
+  uint32_t oprand2;
+  bool signExtend;
+};
+
+struct BoardCastInfo {
+  uint32_t index;
+  uint32_t value;
+  bool flag;
+};
+
+struct ROBInsInfo {
+  uint32_t rd = 0;
+  uint32_t origin_index = 0;
+  uint32_t predict_branch = 0;
+  bool predict_taken = false;
+};
 
 struct ROBCommitInfo {
   uint32_t index = 0;
