@@ -21,6 +21,10 @@ public:
   BoardCastInfo execute(BUInfo &order);
 };
 
+/*"ready"
+For load: just 2 status 0 and 1, symbolizing ready or not.
+For store: 2 status but different dealing ways--0 get ready the same, but 1 need to execute.
+*/
 struct LSBItem {
   InsType type;
   MemType size;
@@ -28,7 +32,7 @@ struct LSBItem {
   uint32_t oprand2;
   uint32_t immediate;
   uint32_t target;
-  buffer<bool> ready = buffer<bool>(false);
+  buffer<uint32_t> ready = buffer<uint32_t>(false);
   buffer<bool> busy = buffer<bool>(false);
   bool ready1 = false;
   bool ready2 = false;

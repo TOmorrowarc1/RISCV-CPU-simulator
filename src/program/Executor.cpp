@@ -49,8 +49,12 @@ BU &BU::getInstance() {
   static BU instance;
   return instance;
 }
+
 BoardCastInfo BU::execute(BUInfo &order){
-  
+  BoardCastInfo result;
+  switch(order.type){
+    
+  }
 }
 
 LSB &LSB::getInstance() {
