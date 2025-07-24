@@ -4,12 +4,6 @@
 
 const int ROBSIZE = 50;
 
-struct ROBCommitInfo {
-  uint32_t index = 0;
-  uint32_t rd = 0;
-  uint32_t value = 0;
-};
-
 // Items store in ROB, the "state" records if it is complete.
 struct ROBItem {
   uint32_t rd = 0;
@@ -25,6 +19,7 @@ private:
   ROBItem storage[ROBSIZE];
   buffer<int> head_;
   buffer<int> tail_;
+  bool flush_flag;
 
   ROB();
   bool empty();
@@ -37,6 +32,7 @@ public:
   BusyValue getOperand(uint32_t index);
   ROBCommitInfo tryCommit();
   void listenCDB(BoardCastInfo info);
+  void branchDeal(BoardCastInfo info);
   void refresh();
 };
 

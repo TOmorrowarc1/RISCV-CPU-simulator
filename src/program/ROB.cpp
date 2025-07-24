@@ -20,8 +20,10 @@ ROB &ROB::getInstance() {
 
 uint32_t ROB::newIns(ROBItem info) {
   uint32_t tail_now = tail_.getValue();
-  tail_.writeValue(next(tail_now));
-  storage[tail_now] = info;
+  if(!flush_flag){
+    storage[tail_now] = info;
+    tail_.writeValue(next(tail_now));
+  }
   return tail_now;
 }
 
@@ -56,9 +58,30 @@ ROBCommitInfo ROB::tryCommit() {
   return answer;
 }
 
+void ROB::branchDeal(BoardCastInfo info) {
+  storage[info.index].state.writeValue(true);
+  if (storage[info.index].predict_taken != info.flag) {
+    flush_flag = true;
+    tail_.writeValue(info.index);
+    ROBFlushInfo flush_info;
+    uint32_t now_tail = tail_.getValue();
+    flush_info.branch = info.value;
+    flush_info.taken = info.flag;
+    flush_info.branch_index = info.index;
+    flush_info.tail_index = now_tail;
+    ROB_flush.writeValue(flush_info);
+    for (int i = info.index; i != now_tail; i = next(i)) {
+      storage[i].busy.writeValue(false);
+    }
+    storage[now_tail].busy.writeValue(false);
+  }
+}
+
 void ROB::refresh() {
   for (int i = 0; i < ROBSIZE; ++i) {
     storage[i].busy.refresh();
     storage[i].state.refresh();
   }
+  head_.refresh();
+  tail_.refresh();
 }
