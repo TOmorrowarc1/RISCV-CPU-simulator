@@ -7,9 +7,6 @@ ALU_RS &ALU_RS::getInstance() {
 
 void ALU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
                     BusyValue &oprand2, uint32_t index) {
-  if (flush_flag) {
-    return;
-  }
   bool flag = false;
   for (int i = 0; i < RSSIZE; ++i) {
     if (!storage[i].busy.getValue()) {
@@ -61,7 +58,6 @@ ALUInfo ALU_RS::tryCommit() {
 }
 
 void ALU_RS::flushReceive(ROBFlushInfo &info) {
-  flush_flag = true;
   for (int i = 0; i < RSSIZE; ++i) {
     if (storage[i].busy.getValue() &&
         isBetween(info.branch_index, info.tail_index, storage[i].ins_index)) {
@@ -84,9 +80,6 @@ BU_RS &BU_RS::getInstance() {
 
 void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
                    BusyValue &oprand2, uint32_t index) {
-  if (flush_flag) {
-    return;
-  }
   bool flag = false;
   for (int i = 0; i < RSSIZE; ++i) {
     if (!storage[i].busy.getValue()) {
@@ -142,7 +135,6 @@ BUInfo BU_RS::tryCommit() {
 }
 
 void BU_RS::flushReceive(ROBFlushInfo &info) {
-  flush_flag = true;
   for (int i = 0; i < RSSIZE; ++i) {
     if (storage[i].busy.getValue() &&
         isBetween(info.branch_index, info.tail_index, storage[i].ins_index)) {

@@ -22,15 +22,13 @@ uint32_t ROB::getTail() { return tail_.getValue(); }
 
 uint32_t ROB::newIns(ROBInsInfo info) {
   uint32_t tail_now = tail_.getValue();
-  if (!flush_flag) {
-    storage[tail_now].busy.writeValue(true);
-    storage[tail_now].state.writeValue(false);
-    storage[tail_now].rd = info.rd;
-    storage[tail_now].origin_index = info.origin_index;
-    storage[tail_now].predict_branch = info.predict_branch;
-    storage[tail_now].predict_taken = info.predict_taken;
-    tail_.writeValue(next(tail_now));
-  }
+  storage[tail_now].busy.writeValue(true);
+  storage[tail_now].state.writeValue(false);
+  storage[tail_now].rd = info.rd;
+  storage[tail_now].origin_index = info.origin_index;
+  storage[tail_now].predict_branch = info.predict_branch;
+  storage[tail_now].predict_taken = info.predict_taken;
+  tail_.writeValue(next(tail_now));
   return tail_now;
 }
 
@@ -52,12 +50,12 @@ void ROB::listenCDB(BoardCastInfo info) {
   storage[info.index].state.writeValue(true);
   storage[info.index].result = info.value;
   if (storage[info.index].predict_branch != 0) {
-    if (storage[info.index].predict_taken != info.flag) {
-      flush_flag = true;
+    if (storage[info.index].predict_taken != info.flag ||
+        storage[info.index].predict_branch != info.branch) {
       tail_.writeValue(info.index);
       ROBFlushInfo flush_info;
       uint32_t now_tail = tail_.getValue();
-      flush_info.branch = info.value;
+      flush_info.branch = info.branch;
       flush_info.taken = info.flag;
       flush_info.branch_index = info.index;
       flush_info.tail_index = now_tail;

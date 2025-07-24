@@ -30,7 +30,6 @@ struct BU_RS_Item {
 class ALU_RS {
 private:
   ALU_RS_Item storage[RSSIZE];
-  bool flush_flag = false;
   ALU_RS() = default;
 
 public:
@@ -46,7 +45,6 @@ public:
 class BU_RS {
 private:
   BU_RS_Item storage[RSSIZE];
-  bool flush_flag = false;
   BU_RS() = default;
 
 public:

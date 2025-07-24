@@ -13,7 +13,6 @@ struct RegFileItem {
 class RegFile {
 private:
   RegFileItem storage[32];
-  bool flush_flag = false;
   RegFile() = default;
 
 public:
