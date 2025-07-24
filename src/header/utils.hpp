@@ -26,8 +26,66 @@ struct BoardCastInfo {
   bool flag;
 };
 
-struct ROBCommitInfo;
+struct BasicInsInfo {
+  uint32_t command;
+  uint32_t ins_pc;
+};
+
+struct BranchPredictInfo {
+  uint32_t branch_predict;
+  uint32_t taken_predict;
+};
+
+enum class InsType { CALC, LOAD, STORE, BRANCH, END };
+enum class CalcType { ADD, SUB, SLL, LT, LTU, SRL, SRA, XOR, OR, AND, IMM };
+enum class MemType { BYTE, HALF, WORD };
+enum class BranchType { JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU };
+
+struct DecodeInsInfo {
+  /*Info used by more than one executor.*/
+  InsType type;
+  uint32_t register1 = 0;
+  uint32_t register2 = 0;
+  uint32_t immdiate = 0;
+  uint32_t pc = 0;
+  uint32_t rd = 0;
+  bool allow = false;
+
+  /*Info used by alu, which will be shaped into ALUControl in stage of issue.*/
+  CalcType calcType = CalcType::ADD;
+  bool signPC = false;
+  bool signImmediate = false;
+
+  /*Info used by mem, grow into MemControl.*/
+  MemType size = MemType::WORD;
+  bool signExtend = false;
+
+  /*Info used by branch, grow into BranchControl.*/
+  BranchType branchType = BranchType::JAL;
+  uint32_t predict_target_addr = 0;
+  bool predict_taken = 0;
+};
+
+struct ExeALUInsInfo;
+struct ExeBUInsInfo;
+struct ExeLSBInsInfo;
+
+struct ROBCommitInfo {
+  uint32_t index = 0;
+  uint32_t rd = 0;
+  uint32_t value = 0;
+};
+
+struct ROBFlushInfo{
+  uint32_t branch;
+  uint32_t taken;
+  uint32_t branch_index;
+  uint32_t tail_index;
+};
 
 extern buffer<ROBCommitInfo> ROB_commit;
+extern buffer<ROBFlushInfo> ROB_flush;
+extern buffer<BasicInsInfo> Fetch_command;
+extern buffer<BranchPredictInfo> PC_predict;
 
 #endif
