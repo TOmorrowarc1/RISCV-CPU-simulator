@@ -18,9 +18,11 @@ ROB &ROB::getInstance() {
   return instance;
 }
 
+uint32_t ROB::getTail() { return tail_.getValue(); }
+
 uint32_t ROB::newIns(ROBItem info) {
   uint32_t tail_now = tail_.getValue();
-  if(!flush_flag){
+  if (!flush_flag) {
     storage[tail_now] = info;
     tail_.writeValue(next(tail_now));
   }

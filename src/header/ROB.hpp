@@ -28,6 +28,7 @@ private:
 
 public:
   static ROB &getInstance();
+  uint32_t getTail();
   uint32_t newIns(ROBItem info);
   BusyValue getOperand(uint32_t index);
   ROBCommitInfo tryCommit();
