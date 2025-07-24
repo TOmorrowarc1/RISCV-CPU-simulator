@@ -62,12 +62,14 @@ struct DecodeInsInfo {
 };
 
 struct ALUInfo {
+  uint32_t index = 50;
   CalcType type = CalcType::ADD;
   uint32_t oprand1 = 0;
   uint32_t oprand2 = 0;
 };
 
 struct BUInfo {
+  uint32_t index = 50;
   BranchType type = BranchType::BEQ;
   uint32_t oprand1 = 0;
   uint32_t oprand2 = 0;
@@ -76,11 +78,12 @@ struct BUInfo {
 };
 
 struct LSBInfo {
+  uint32_t index = 50;
   InsType type;
   MemType size;
   uint32_t immdiate;
-  uint32_t oprand1;
-  uint32_t oprand2;
+  uint32_t oprand1 = 0;
+  uint32_t oprand2 = 0;
   bool signExtend;
 };
 
