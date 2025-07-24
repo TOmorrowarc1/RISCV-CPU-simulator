@@ -1,5 +1,6 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
+#include <stdexcept>
 #include <stdint.h>
 
 template <typename T> class buffer {
@@ -76,7 +77,7 @@ struct ROBCommitInfo {
   uint32_t value = 0;
 };
 
-struct ROBFlushInfo{
+struct ROBFlushInfo {
   uint32_t branch;
   uint32_t taken;
   uint32_t branch_index;
