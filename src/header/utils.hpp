@@ -110,6 +110,8 @@ struct ROBFlushInfo {
   uint32_t tail_index;
 };
 
+bool isBetween(uint32_t front, uint32_t end, uint32_t target);
+
 extern buffer<BasicInsInfo> Fetch_command;
 extern buffer<BranchPredictInfo> PC_predict;
 
@@ -123,6 +125,5 @@ extern buffer<BoardCastInfo> LSB_result;
 
 extern buffer<ROBCommitInfo> ROB_commit;
 extern buffer<ROBFlushInfo> ROB_flush;
-
 
 #endif
