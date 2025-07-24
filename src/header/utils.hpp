@@ -110,9 +110,19 @@ struct ROBFlushInfo {
   uint32_t tail_index;
 };
 
-extern buffer<ROBCommitInfo> ROB_commit;
-extern buffer<ROBFlushInfo> ROB_flush;
 extern buffer<BasicInsInfo> Fetch_command;
 extern buffer<BranchPredictInfo> PC_predict;
+
+extern buffer<ALUInfo> ALU_ready;
+extern buffer<BUInfo> BU_ready;
+extern buffer<LSBInfo> LSB_ready;
+
+extern buffer<BoardCastInfo> ALU_result;
+extern buffer<BoardCastInfo> BU_result;
+extern buffer<BoardCastInfo> LSB_result;
+
+extern buffer<ROBCommitInfo> ROB_commit;
+extern buffer<ROBFlushInfo> ROB_flush;
+
 
 #endif
