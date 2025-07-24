@@ -41,7 +41,7 @@ struct DecodeInsInfo {
   InsType type;
   uint32_t register1 = 0;
   uint32_t register2 = 0;
-  uint32_t immdiate = 0;
+  uint32_t immediate = 0;
   uint32_t pc = 0;
   uint32_t rd = 0;
   bool allow = false;
@@ -90,6 +90,7 @@ struct LSBInfo {
 struct BoardCastInfo {
   uint32_t index;
   uint32_t value;
+  uint32_t branch;
   bool flag;
 };
 
