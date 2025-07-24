@@ -84,4 +84,6 @@ void ROB::refresh() {
   }
   head_.refresh();
   tail_.refresh();
+  ROB_commit.writeValue(ROBCommitInfo());
+  ROB_flush.writeValue(ROBFlushInfo());
 }
