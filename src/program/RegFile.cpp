@@ -29,6 +29,12 @@ void RegFile::commitReceive(ROBCommitInfo &info) {
   storage[info.rd].busy = !(storage[info.rd].ins_index == info.index);
 }
 
-void RegFile::flushRecieve(ROBFlushInfo &info) {}
-
-void RegFile::refresh() {}
+void RegFile::flushRecieve(ROBFlushReg &regs) {
+  for (int i = 0; i < 32; ++i) {
+    if (regs.recover[i] != 50) {
+      storage[i].ins_index = regs.recover[i];
+    } else {
+      storage[i].busy = false;
+    }
+  }
+}

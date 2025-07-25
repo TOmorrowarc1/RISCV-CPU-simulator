@@ -25,6 +25,7 @@ private:
   ROB();
   bool empty();
   bool full();
+  uint32_t front(uint32_t now);
   uint32_t next(uint32_t now);
 
 public:

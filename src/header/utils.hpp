@@ -115,6 +115,10 @@ struct ROBFlushInfo {
   uint32_t tail_index;
 };
 
+struct ROBFlushReg {
+  uint32_t recover[32];
+};
+
 bool isBetween(uint32_t front, uint32_t end, uint32_t target);
 
 extern buffer<BasicInsInfo> Fetch_command;
@@ -132,5 +136,6 @@ extern buffer<BoardCastInfo> CDB_result;
 
 extern buffer<ROBCommitInfo> ROB_commit;
 extern buffer<ROBFlushInfo> ROB_flush;
+extern buffer<ROBFlushReg> ROB_flush_reg;
 
 #endif

@@ -20,8 +20,7 @@ public:
   BusyValue tryRead(uint32_t target);
   BusyValue tryWrite(uint32_t target, uint32_t ins_index);
   void commitReceive(ROBCommitInfo &info);
-  void flushRecieve(ROBFlushInfo &info);
-  void refresh();
+  void flushRecieve(ROBFlushReg &regs);
 };
 
 #endif

@@ -11,6 +11,9 @@ bool ROB::full() {
          storage[head_.getValue()].busy.getValue();
 }
 
+uint32_t ROB::front(uint32_t now) {
+  return now - 1 < 0 ? ROBSIZE - 1 : now - 1;
+}
 uint32_t ROB::next(uint32_t now) { return now + 1 == ROBSIZE ? 0 : now + 1; }
 
 ROB &ROB::getInstance() {
@@ -21,6 +24,9 @@ ROB &ROB::getInstance() {
 uint32_t ROB::getTail() { return tail_.getValue(); }
 
 uint32_t ROB::newIns(ROBInsInfo info) {
+  if (flush_flag) {
+    return;
+  }
   uint32_t tail_now = tail_.getValue();
   storage[tail_now].busy.writeValue(true);
   storage[tail_now].state.writeValue(false);
@@ -55,8 +61,10 @@ void ROB::listenCDB(BoardCastInfo info) {
   if (storage[info.index].predict_branch != 0) {
     if (storage[info.index].predict_taken != info.flag ||
         storage[info.index].predict_branch != info.branch) {
+      flush_flag = true;
       tail_.writeValue(info.index);
       ROBFlushInfo flush_info;
+      ROBFlushReg flush_regs;
       uint32_t now_tail = tail_.getValue();
       flush_info.branch = info.branch;
       flush_info.taken = info.flag;
@@ -67,8 +75,13 @@ void ROB::listenCDB(BoardCastInfo info) {
         storage[i].busy.writeValue(false);
       }
       storage[now_tail].busy.writeValue(false);
-    } else {
-      flush_flag = true;
+      for (int i = 0; i < 50; ++i) {
+        flush_regs.recover[i] = 50;
+      }
+      for (int i = now_tail; i != info.index; i = front(i)) {
+        flush_regs.recover[storage[i].rd] = storage[i].origin_index;
+      }
+      ROB_flush_reg.writeValue(flush_regs);
     }
   }
 }

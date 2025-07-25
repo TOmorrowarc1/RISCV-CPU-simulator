@@ -13,7 +13,8 @@ void StageFetch() {
 void StageIssue() {
   if (ROB_flush.getValue().branch != 0) {
     auto flush_info = ROB_flush.getValue();
-    RegFile::getInstance().flushRecieve(flush_info);
+    auto flush_regs = ROB_flush_reg.getValue();
+    RegFile::getInstance().flushRecieve(flush_regs);
     ALU_RS::getInstance().flushReceive(flush_info);
     BU_RS::getInstance().flushReceive(flush_info);
     LSB::getInstance().flushReceive(flush_info);
@@ -111,7 +112,6 @@ void StageCommit() {
 
 void RefreshStage() {
   PC::getInstance().refresh();
-  RegFile::getInstance().refresh();
   ALU_RS::getInstance().refresh();
   BU_RS::getInstance().refresh();
   LSB::getInstance().refresh();
@@ -128,6 +128,7 @@ void RefreshStage() {
   CDB_result.refresh();
   ROB_commit.refresh();
   ROB_flush.refresh();
+  ROB_flush_reg.refresh();
 
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();

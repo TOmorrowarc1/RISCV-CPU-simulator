@@ -23,3 +23,4 @@ buffer<BoardCastInfo> CDB_result;
 
 buffer<ROBCommitInfo> ROB_commit;
 buffer<ROBFlushInfo> ROB_flush;
+buffer<ROBFlushReg> ROB_flush_reg;
