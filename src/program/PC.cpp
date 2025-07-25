@@ -1,5 +1,7 @@
 #include "header/PC.hpp"
 
+PC::PC() : pc_(0) {}
+
 PC &PC::getInstance() {
   static PC instance;
   return instance;
