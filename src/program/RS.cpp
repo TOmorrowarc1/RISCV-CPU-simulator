@@ -47,6 +47,7 @@ ALUInfo ALU_RS::tryCommit() {
   ALUInfo result;
   for (int i = 0; i < RSSIZE; ++i) {
     if (storage[i].ready.getValue()) {
+      result.index = storage[i].ins_index;
       result.oprand1 = storage[i].oprand1;
       result.oprand2 = storage[i].oprand2;
       result.type = storage[i].type;
@@ -91,7 +92,7 @@ void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
       storage[i].ready1 = oprand1.busy;
       storage[i].oprand2 = oprand2.value;
       storage[i].ready2 = oprand2.busy;
-      storage[i].immediate = decode.immdiate;
+      storage[i].immediate = decode.immediate;
       storage[i].pc = decode.pc;
       flag = true;
       break;
@@ -122,6 +123,7 @@ BUInfo BU_RS::tryCommit() {
   BUInfo result;
   for (int i = 0; i < RSSIZE; ++i) {
     if (storage[i].ready.getValue()) {
+      result.index = storage[i].ins_index;
       result.type = storage[i].type;
       result.oprand1 = storage[i].oprand1;
       result.oprand2 = storage[i].oprand2;

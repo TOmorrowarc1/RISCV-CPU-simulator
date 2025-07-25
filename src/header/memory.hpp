@@ -1,9 +1,8 @@
 #ifndef MEMORY_HPP
 #define MEMORY_HPP
+#include "utils.hpp"
 #include <cstddef>
 #include <cstring>
-#include <stdexcept>
-#include <stdint.h>
 
 const int MEMSIZE = 4194304; // 4 MB
 

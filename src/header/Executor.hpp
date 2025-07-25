@@ -1,6 +1,6 @@
 #ifndef EXECUTE_HPP
 #define EXECUTE_HPP
-#include "utils.hpp"
+#include "memory.hpp"
 
 const uint32_t LSBSIZE = 8;
 class ALU {
@@ -23,11 +23,13 @@ public:
 
 /*"ready"
 For load: just 2 status 0 and 1, symbolizing ready or not.
-For store: 2 status but different dealing ways--0 get ready the same, but 1 need to execute.
+For store: 2 status but different dealing ways--0 get ready the same, but 1 need
+to execute.
 */
 struct LSBItem {
   InsType type;
-  MemType size;
+  uint32_t size;
+  uint32_t ins_index;
   uint32_t oprand1;
   uint32_t oprand2;
   uint32_t immediate;
@@ -43,14 +45,17 @@ private:
   LSBItem storage[LSBSIZE];
   buffer<uint32_t> head_;
   buffer<uint32_t> tail_;
+
   LSB();
+  uint32_t front(uint32_t now);
+  uint32_t next(uint32_t now);
 
 public:
   static LSB &getInstance();
   void newIns(DecodeInsInfo &decode, BusyValue &oprand1, BusyValue &oprand2,
               uint32_t index);
   void listenCDB(BoardCastInfo &info);
-  BoardCastInfo tryExecute();
+  BoardCastInfo tryExecute(ROBCommitInfo &info);
   void flushReceive(ROBFlushInfo &info);
   void refresh();
 };
