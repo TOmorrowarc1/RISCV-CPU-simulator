@@ -193,38 +193,40 @@ void LSB::listenCDB(BoardCastInfo &info) {
 BoardCastInfo LSB::tryExecute(ROBCommitInfo &info) {
   BoardCastInfo result;
   uint32_t head_now = head_.getValue();
-  switch (storage[head_now].ready.getValue()) {
-  case 0:
-    return result;
-  case 1:
-    storage[head_now].ready.writeValue(2);
-    if (storage[head_now].type == InsType::STORE) {
-      result.index = storage[head_now].ins_index;
-      result.value = storage[head_now].target;
-    }
-    break;
-  case 2:
-    if (storage[head_now].type == InsType::LOAD) {
-      storage[head_now].ready.writeValue(3);
-    } else {
-      if (info.index == storage[head_now].ins_index) {
-        storage[head_now].ready.writeValue(3);
+  if (storage[head_now].busy.getValue()) {
+    switch (storage[head_now].ready.getValue()) {
+    case 0:
+      return result;
+    case 1:
+      storage[head_now].ready.writeValue(2);
+      if (storage[head_now].type == InsType::STORE) {
+        result.index = storage[head_now].ins_index;
+        result.value = storage[head_now].target;
       }
+      break;
+    case 2:
+      if (storage[head_now].type == InsType::LOAD) {
+        storage[head_now].ready.writeValue(3);
+      } else {
+        if (info.index == storage[head_now].ins_index) {
+          storage[head_now].ready.writeValue(3);
+        }
+      }
+      break;
+    case 3:
+      if (storage[head_now].type == InsType::LOAD) {
+        result.index = storage[head_now].ins_index;
+        result.value = Memory::getInstance().load(storage[head_now].target,
+                                                  storage[head_now].size);
+      } else {
+        Memory::getInstance().store(storage[head_now].target,
+                                    storage[head_now].size,
+                                    storage[head_now].oprand2);
+      }
+      storage[head_now].busy.writeValue(false);
+      head_.writeValue(next(head_now));
+      break;
     }
-    break;
-  case 3:
-    if (storage[head_now].type == InsType::LOAD) {
-      result.index = storage[head_now].ins_index;
-      result.value = Memory::getInstance().load(storage[head_now].target,
-                                                storage[head_now].size);
-    } else {
-      Memory::getInstance().store(storage[head_now].target,
-                                  storage[head_now].size,
-                                  storage[head_now].oprand2);
-    }
-    storage[head_now].busy.writeValue(false);
-    head_.writeValue(next(head_now));
-    break;
   }
   return result;
 }
