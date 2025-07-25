@@ -11,13 +11,13 @@ void ALU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
   for (int i = 0; i < RSSIZE; ++i) {
     if (!storage[i].busy.getValue()) {
       storage[i].busy.writeValue(true);
-      storage[i].ready.writeValue(oprand1.busy && oprand2.busy);
+      storage[i].ready.writeValue(!oprand1.busy && !oprand2.busy);
       storage[i].ins_index = index;
       storage[i].type = decode.calcType;
       storage[i].oprand1 = oprand1.value;
-      storage[i].ready1 = oprand1.busy;
+      storage[i].ready1 = !oprand1.busy;
       storage[i].oprand2 = oprand2.value;
-      storage[i].ready2 = oprand2.busy;
+      storage[i].ready2 = !oprand2.busy;
       flag = true;
       break;
     }
@@ -85,13 +85,13 @@ void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
   for (int i = 0; i < RSSIZE; ++i) {
     if (!storage[i].busy.getValue()) {
       storage[i].busy.writeValue(true);
-      storage[i].ready.writeValue(oprand1.busy && oprand2.busy);
+      storage[i].ready.writeValue(!oprand1.busy && !oprand2.busy);
       storage[i].ins_index = index;
       storage[i].type = decode.branchType;
       storage[i].oprand1 = oprand1.value;
-      storage[i].ready1 = oprand1.busy;
+      storage[i].ready1 = !oprand1.busy;
       storage[i].oprand2 = oprand2.value;
-      storage[i].ready2 = oprand2.busy;
+      storage[i].ready2 = !oprand2.busy;
       storage[i].immediate = decode.immediate;
       storage[i].pc = decode.pc;
       flag = true;
