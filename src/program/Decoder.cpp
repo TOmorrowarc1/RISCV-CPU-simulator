@@ -11,6 +11,8 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
   result.register1 = (ins.command >> 15) & 0x1f;
   result.register2 = (ins.command >> 20) & 0x1f;
   result.rd = (ins.command >> 7) & 0x1f;
+  result.predict_target_addr = branch.branch_predict;
+  result.predict_taken = branch.taken_predict;
   uint32_t opcode = ins.command & 0x7f;
   switch (opcode) {
   case 0x33: {
@@ -57,7 +59,7 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
       result.calcType = CalcType::AND;
       break;
     default:
-      throw std::exception();
+      break;
     }
     break;
   }
@@ -238,12 +240,10 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
                             (((ins.command >> 31) & 1) << 20))
                            << 11) >>
                        11;
-    result.predict_taken = true;
-    result.predict_target_addr = result.pc + result.immediate;
     break;
   }
   default: {
-    throw std::exception();
+    break;
   }
   }
   return result;
