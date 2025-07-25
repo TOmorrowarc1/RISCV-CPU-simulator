@@ -103,16 +103,16 @@ struct ROBInsInfo {
 };
 
 struct ROBCommitInfo {
-  uint32_t index = 0;
+  uint32_t index = 50;
   uint32_t rd = 0;
   uint32_t value = 0;
 };
 
 struct ROBFlushInfo {
   uint32_t branch = 0;
-  uint32_t branch_index = 0;
-  uint32_t tail_index = 0;
-  bool taken = 0;
+  uint32_t branch_index = 50;
+  uint32_t tail_index = 50;
+  bool taken = false;
 };
 
 struct ROBFlushReg {

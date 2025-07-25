@@ -18,6 +18,8 @@ void StageIssue() {
     ALU_RS::getInstance().flushReceive(flush_info);
     BU_RS::getInstance().flushReceive(flush_info);
     LSB::getInstance().flushReceive(flush_info);
+    ALU_ready.writeValue(ALUInfo());
+    BU_ready.writeValue(BUInfo());
     return;
   }
 
@@ -79,6 +81,9 @@ void StageIssue() {
 
 void StageExecute() {
   if (ROB_flush.getValue().branch != 0) {
+    ALU_result.writeValue(BoardCastInfo());
+    BU_result.writeValue(BoardCastInfo());
+    LSB_result.writeValue(BoardCastInfo());
     return;
   }
   auto alu_info = ALU_ready.getValue();
@@ -93,6 +98,7 @@ void StageBoardcast() {
   if (ROB_flush.getValue().branch != 0) {
     auto flush_info = ROB_flush.getValue();
     CDBSelector::getInstance().flushReceive(flush_info);
+    CDB_result.writeValue(BoardCastInfo());
     return;
   }
   auto alu_result = ALU_result.getValue();
@@ -111,13 +117,6 @@ void StageCommit() {
 }
 
 void RefreshStage() {
-  PC::getInstance().refresh();
-  ALU_RS::getInstance().refresh();
-  BU_RS::getInstance().refresh();
-  LSB::getInstance().refresh();
-  CDBSelector::getInstance().refresh();
-  ROB::getInstance().refresh();
-
   Fetch_command.refresh();
   PC_predict.refresh();
   ALU_ready.refresh();
@@ -129,6 +128,13 @@ void RefreshStage() {
   ROB_commit.refresh();
   ROB_flush.refresh();
   ROB_flush_reg.refresh();
+
+  PC::getInstance().refresh();
+  ALU_RS::getInstance().refresh();
+  BU_RS::getInstance().refresh();
+  LSB::getInstance().refresh();
+  CDBSelector::getInstance().refresh();
+  ROB::getInstance().refresh();
 
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();

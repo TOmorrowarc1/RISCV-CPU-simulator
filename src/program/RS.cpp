@@ -46,7 +46,7 @@ void ALU_RS::listenCDB(BoardCastInfo &info) {
 ALUInfo ALU_RS::tryCommit() {
   ALUInfo result;
   for (int i = 0; i < RSSIZE; ++i) {
-    if (storage[i].ready.getValue()) {
+    if (storage[i].busy.getValue() && storage[i].ready.getValue()) {
       result.index = storage[i].ins_index;
       result.oprand1 = storage[i].oprand1;
       result.oprand2 = storage[i].oprand2;
@@ -122,7 +122,7 @@ void BU_RS::listenCDB(BoardCastInfo &info) {
 BUInfo BU_RS::tryCommit() {
   BUInfo result;
   for (int i = 0; i < RSSIZE; ++i) {
-    if (storage[i].ready.getValue()) {
+    if (storage[i].busy.getValue() && storage[i].ready.getValue()) {
       result.index = storage[i].ins_index;
       result.type = storage[i].type;
       result.oprand1 = storage[i].oprand1;

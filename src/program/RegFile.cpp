@@ -6,6 +6,9 @@ RegFile &RegFile::getInstance() {
 }
 
 BusyValue RegFile::tryRead(uint32_t target) {
+  if (target == 0) {
+    return {false, 0};
+  }
   BusyValue result;
   result.busy = storage[target].busy;
   result.value =
