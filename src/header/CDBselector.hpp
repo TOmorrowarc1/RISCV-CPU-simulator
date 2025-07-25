@@ -7,6 +7,7 @@ struct CDBItem {
   BoardCastInfo content;
   buffer<bool> busy = buffer<bool>(false);
 };
+
 class CDBSelector {
 private:
   CDBItem storage[CDBSIZE];
