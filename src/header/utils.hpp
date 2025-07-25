@@ -23,13 +23,13 @@ struct BusyValue {
 };
 
 struct BasicInsInfo {
-  uint32_t command;
-  uint32_t ins_pc;
+  uint32_t command = 0;
+  uint32_t ins_pc = 0;
 };
 
 struct BranchPredictInfo {
-  uint32_t branch_predict;
-  uint32_t taken_predict;
+  uint32_t branch_predict = 0;
+  uint32_t taken_predict = 0;
 };
 
 enum class InsType { CALC, LOAD, STORE, BRANCH, END };
@@ -74,30 +74,30 @@ struct BUInfo {
   BranchType type = BranchType::BEQ;
   uint32_t oprand1 = 0;
   uint32_t oprand2 = 0;
-  uint32_t immdiate;
-  uint32_t pc;
+  uint32_t immdiate = 0;
+  uint32_t pc = 0;
 };
 
 struct LSBInfo {
   uint32_t index = 50;
-  InsType type;
-  MemType size;
-  uint32_t immdiate;
+  InsType type = InsType::LOAD;
+  MemType size = MemType::BYTE;
+  uint32_t immdiate = 0;
   uint32_t oprand1 = 0;
   uint32_t oprand2 = 0;
-  bool signExtend;
+  bool signExtend = false;
 };
 
 struct BoardCastInfo {
   uint32_t index = 50;
-  uint32_t value;
-  uint32_t branch;
-  bool flag;
+  uint32_t value = 0;
+  uint32_t branch = 0;
+  bool flag = false;
 };
 
 struct ROBInsInfo {
   uint32_t rd = 0;
-  uint32_t origin_index = 0;
+  uint32_t origin_index = 50;
   uint32_t predict_branch = 0;
   bool predict_taken = false;
 };
@@ -109,10 +109,10 @@ struct ROBCommitInfo {
 };
 
 struct ROBFlushInfo {
-  uint32_t branch;
-  uint32_t taken;
-  uint32_t branch_index;
-  uint32_t tail_index;
+  uint32_t branch = 0;
+  uint32_t branch_index = 0;
+  uint32_t tail_index = 0;
+  bool taken = 0;
 };
 
 struct ROBFlushReg {
