@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <stdint.h>
 
+extern bool stop_flag;
 template <typename T> class buffer {
 private:
   T now_value_;

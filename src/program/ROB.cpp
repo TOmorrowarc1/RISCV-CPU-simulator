@@ -25,6 +25,9 @@ uint32_t ROB::newIns(ROBInsInfo info) {
   storage[tail_now].busy.writeValue(true);
   storage[tail_now].state.writeValue(false);
   storage[tail_now].rd = info.rd;
+  if (info.predict_branch == -114514) {
+    storage[tail_now].state.writeValue(true);
+  }
   storage[tail_now].origin_index = info.origin_index;
   storage[tail_now].predict_branch = info.predict_branch;
   storage[tail_now].predict_taken = info.predict_taken;
@@ -82,6 +85,9 @@ ROBCommitInfo ROB::tryCommit() {
     answer.value = storage[head_now].result;
     storage[head_now].busy.writeValue(false);
     head_.writeValue(next(head_now));
+    if (storage[head_now].predict_branch = -114514) {
+      stop_flag = true;
+    }
   }
   return answer;
 }

@@ -65,15 +65,16 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
     // for type 'I': immediate calculation.
     result.type = InsType::CALC;
     result.signImmediate = true;
-    result.immdiate = int(ins.command) >> 20;
+    result.immediate = int(ins.command) >> 20;
     result.allow = true;
     uint32_t func3_ = (ins.command >> 12) & 0x7;
     uint32_t func7_ = (ins.command >> 25) & 0x7f;
     switch (func3_) {
     case 0x0:
       result.calcType = CalcType::ADD;
-      if (result.immdiate == 255) {
+      if (result.immediate == 255) {
         result.type = InsType::END;
+        result.predict_target_addr = -114514;
       }
       break;
     case 0x1:
@@ -89,7 +90,7 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
       result.calcType = CalcType::XOR;
       break;
     case 0x5:
-      result.immdiate = result.immdiate & 0x1f;
+      result.immediate = result.immediate & 0x1f;
       if (func7_ == 0x00) {
         result.calcType = CalcType::SRL;
       } else if (func7_ == 0x20) {
@@ -112,7 +113,7 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
   case 0x3: {
     // for type 'I': load reg2 into reg1+imm.
     result.type = InsType::LOAD;
-    result.immdiate = int(ins.command) >> 20;
+    result.immediate = int(ins.command) >> 20;
     result.allow = true;
     result.rd = (ins.command >> 7) & 0x1f;
     uint32_t func3_ = (ins.command >> 12) & 0x7;
@@ -146,14 +147,14 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
     // for type 'I': (JALR) pc=reg1+imm, rd=pc+4, black sheep No.2.
     result.type = InsType::BRANCH;
     result.branchType = BranchType::JALR;
-    result.immdiate = int(ins.command) >> 20;
+    result.immediate = int(ins.command) >> 20;
     result.allow = true;
     break;
   }
   case 0x23: {
     // for type 'S': store reg2 into reg1+imm;
     result.type = InsType::STORE;
-    result.immdiate =
+    result.immediate =
         int(((((ins.command >> 25) & 0x7f) << 5) | ((ins.command >> 7) & 0x1f))
             << 20) >>
         20;
@@ -176,12 +177,12 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
   case 0x63: {
     /* for type 'B': conditional branch: examine the prediction.*/
     result.type = InsType::BRANCH;
-    result.immdiate = int(((((ins.command >> 7) & 0x1) << 11) |
-                           (((ins.command >> 8) & 0xf) << 1) |
-                           (((ins.command >> 25) & 0x3f) << 5) |
-                           (((ins.command >> 31) & 0x1) << 12))
-                          << 19) >>
-                      19;
+    result.immediate = int(((((ins.command >> 7) & 0x1) << 11) |
+                            (((ins.command >> 8) & 0xf) << 1) |
+                            (((ins.command >> 25) & 0x3f) << 5) |
+                            (((ins.command >> 31) & 0x1) << 12))
+                           << 19) >>
+                       19;
     uint32_t func3_ = (ins.command >> 12) & 0x7;
     switch (func3_) {
     case 0x0:
@@ -212,7 +213,7 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
     result.type = InsType::CALC;
     result.calcType = CalcType::IMM;
     result.signImmediate = true;
-    result.immdiate = ins.command & 0xfffff000;
+    result.immediate = ins.command & 0xfffff000;
     result.allow = true;
     break;
   }
@@ -222,7 +223,7 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
     result.calcType = CalcType::ADD;
     result.signPC = true;
     result.signImmediate = true;
-    result.immdiate = ins.command & 0xfffff000;
+    result.immediate = ins.command & 0xfffff000;
     result.allow = true;
     break;
   }
@@ -231,14 +232,14 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
     result.type = InsType::BRANCH;
     result.branchType = BranchType::JAL;
     result.allow = true;
-    result.immdiate = int(((((ins.command >> 12) & 0xff) << 12) |
-                           (((ins.command >> 20) & 0x1) << 11) |
-                           (((ins.command >> 21) & 0x3ff) << 1) |
-                           (((ins.command >> 31) & 1) << 20))
-                          << 11) >>
-                      11;
+    result.immediate = int(((((ins.command >> 12) & 0xff) << 12) |
+                            (((ins.command >> 20) & 0x1) << 11) |
+                            (((ins.command >> 21) & 0x3ff) << 1) |
+                            (((ins.command >> 31) & 1) << 20))
+                           << 11) >>
+                       11;
     result.predict_taken = true;
-    result.predict_target_addr = result.pc + result.immdiate;
+    result.predict_target_addr = result.pc + result.immediate;
     break;
   }
   default: {

@@ -1,4 +1,5 @@
 #include "header/run.hpp"
+#include <iostream>
 
 void StageFetch() {
   PC_predict.writeValue(PC::getInstance().branchPredict());
@@ -42,12 +43,14 @@ void StageIssue() {
   } else if (oprand2_info.busy) {
     oprand2_info = ROB::getInstance().getOperand(oprand2_info.value);
   }
-  auto write_info = RegFile::getInstance().tryWrite(info.rd, index);
   ROBInsInfo newIns_info;
   newIns_info.rd = info.rd;
-  newIns_info.origin_index = write_info.busy ? write_info.value : 50;
   newIns_info.predict_branch = info.predict_target_addr;
   newIns_info.predict_taken = info.predict_taken;
+  if (info.type != InsType::END) {
+    auto write_info = RegFile::getInstance().tryWrite(info.rd, index);
+    newIns_info.origin_index = write_info.busy ? write_info.value : 50;
+  }
   ROB::getInstance().newIns(newIns_info);
 
   // Dispatch.
@@ -125,4 +128,9 @@ void RefreshStage() {
   CDB_result.refresh();
   ROB_commit.refresh();
   ROB_flush.refresh();
+
+  if (stop_flag) {
+    auto commit_check = ROB_commit.getValue();
+    std::cout << RegFile::getInstance().tryRead(commit_check.rd).value;
+  }
 }
