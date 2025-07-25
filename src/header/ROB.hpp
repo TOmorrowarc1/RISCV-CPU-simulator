@@ -20,6 +20,7 @@ private:
   ROBItem storage[ROBSIZE];
   buffer<int> head_;
   buffer<int> tail_;
+  bool flush_flag;
 
   ROB();
   bool empty();

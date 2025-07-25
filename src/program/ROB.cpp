@@ -1,6 +1,6 @@
 #include "header/ROB.hpp"
 
-ROB::ROB() : head_(0), tail_(0) {}
+ROB::ROB() : head_(0), tail_(0) { flush_flag = false; }
 
 bool ROB::empty() {
   return head_.getValue() == tail_.getValue() &&
@@ -64,11 +64,16 @@ void ROB::listenCDB(BoardCastInfo info) {
         storage[i].busy.writeValue(false);
       }
       storage[now_tail].busy.writeValue(false);
+    } else {
+      flush_flag = true;
     }
   }
 }
 
 ROBCommitInfo ROB::tryCommit() {
+  if (flush_flag) {
+    return;
+  }
   ROBCommitInfo answer;
   uint32_t head_now = head_.getValue();
   answer.index = head_now;
@@ -88,6 +93,7 @@ void ROB::refresh() {
   }
   head_.refresh();
   tail_.refresh();
+  flush_flag = false;
   ROB_commit.writeValue(ROBCommitInfo());
   ROB_flush.writeValue(ROBFlushInfo());
 }

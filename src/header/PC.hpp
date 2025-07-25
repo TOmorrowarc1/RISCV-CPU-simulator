@@ -10,7 +10,7 @@ private:
 public:
   static PC &getInstance();
   BranchPredictInfo branchPredict();
-  BasicInsInfo fetchCommand(uint32_t address);
+  BasicInsInfo fetchCommand();
   void flushReceive(ROBFlushInfo &info);
   void refresh();
 };

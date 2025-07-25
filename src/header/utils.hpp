@@ -127,6 +127,8 @@ extern buffer<BoardCastInfo> ALU_result;
 extern buffer<BoardCastInfo> BU_result;
 extern buffer<BoardCastInfo> LSB_result;
 
+extern buffer<BoardCastInfo> CDB_result;
+
 extern buffer<ROBCommitInfo> ROB_commit;
 extern buffer<ROBFlushInfo> ROB_flush;
 

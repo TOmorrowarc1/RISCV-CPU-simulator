@@ -9,13 +9,15 @@ PC &PC::getInstance() {
 
 BranchPredictInfo PC::branchPredict() {
   BranchPredictInfo result;
-  result.branch_predict = pc_.getValue();
+  uint32_t pc_next = pc_.getValue() + 4;
+  result.branch_predict = pc_.getValue() + 4;
   result.taken_predict = false;
+  pc_.writeValue(pc_next);
   return result;
 }
 
-BasicInsInfo PC::fetchCommand(uint32_t address) {
-  uint32_t command = Memory::getInstance().load(address, 4);
+BasicInsInfo PC::fetchCommand() {
+  uint32_t command = Memory::getInstance().load(pc_.getValue(), 4);
   return {command, pc_.getValue()};
 }
 

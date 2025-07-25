@@ -7,4 +7,13 @@
 #include "ROB.hpp"
 #include "RS.hpp"
 #include "RegFile.hpp"
+
+void StageFetch();
+void StageIssue();
+void StageExecute();
+void StageBoardcast();
+void StageCommit();
+
+void RefreshStage();
+
 #endif

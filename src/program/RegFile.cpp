@@ -13,6 +13,9 @@ BusyValue RegFile::tryRead(uint32_t target) {
 }
 
 BusyValue RegFile::tryWrite(uint32_t target, uint32_t ins_index) {
+  if (target == 0) {
+    return;
+  }
   BusyValue result;
   result.busy = storage[target].busy;
   result.value = storage[target].ins_index;
@@ -26,8 +29,6 @@ void RegFile::commitReceive(ROBCommitInfo &info) {
   storage[info.rd].busy = !(storage[info.rd].ins_index == info.index);
 }
 
-void RegFile::flushRecieve(ROBFlushInfo &info) {
-  
-}
+void RegFile::flushRecieve(ROBFlushInfo &info) {}
 
 void RegFile::refresh() {}
