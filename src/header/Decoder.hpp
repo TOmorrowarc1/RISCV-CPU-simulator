@@ -4,7 +4,7 @@
 
 class Decoder {
 private:
-  Decoder();
+  Decoder() = default;
 
 public:
   static Decoder &getInstance();

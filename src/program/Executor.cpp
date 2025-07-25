@@ -1,4 +1,4 @@
-#include "header/Executor.hpp"
+#include "Executor.hpp"
 
 ALU &ALU::getInstance() {
   static ALU instance;
@@ -120,6 +120,7 @@ BoardCastInfo BU::execute(BUInfo &order) {
   default:
     throw std::exception();
   }
+  return result;
 }
 
 uint32_t LSB::front(uint32_t now) {
@@ -194,7 +195,7 @@ BoardCastInfo LSB::tryExecute(ROBCommitInfo &info) {
   uint32_t head_now = head_.getValue();
   switch (storage[head_now].ready.getValue()) {
   case 0:
-    return;
+    return result;
   case 1:
     storage[head_now].ready.writeValue(2);
     if (storage[head_now].type == InsType::STORE) {

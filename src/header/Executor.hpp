@@ -5,7 +5,7 @@
 const uint32_t LSBSIZE = 8;
 class ALU {
 private:
-  ALU();
+  ALU() = default;
 
 public:
   static ALU &getInstance();
@@ -14,7 +14,7 @@ public:
 
 class BU {
 private:
-  BU();
+  BU() = default;
 
 public:
   static BU &getInstance();
@@ -46,7 +46,7 @@ private:
   buffer<uint32_t> head_;
   buffer<uint32_t> tail_;
 
-  LSB();
+  LSB() = default;
   uint32_t front(uint32_t now);
   uint32_t next(uint32_t now);
 

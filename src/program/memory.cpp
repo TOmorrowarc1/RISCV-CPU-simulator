@@ -1,4 +1,4 @@
-#include "header/memory.hpp"
+#include "memory.hpp"
 
 Memory &Memory::getInstance() {
   static Memory instance;

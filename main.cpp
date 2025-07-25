@@ -1,4 +1,4 @@
-#include "header/run.hpp"
+#include "run.hpp"
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -15,7 +15,7 @@ int main() {
     StageCommit();
     RefreshStage();
   }
-  return;
+  return 0;
 }
 
 bool loadMemory(const std::string &filename) {

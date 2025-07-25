@@ -1,4 +1,4 @@
-#include "header/RegFile.hpp"
+#include "RegFile.hpp"
 
 RegFile &RegFile::getInstance() {
   static RegFile instance;
@@ -10,11 +10,12 @@ BusyValue RegFile::tryRead(uint32_t target) {
   result.busy = storage[target].busy;
   result.value =
       (result.busy) ? storage[target].ins_index : storage[target].value;
+  return result;
 }
 
 BusyValue RegFile::tryWrite(uint32_t target, uint32_t ins_index) {
   if (target == 0) {
-    return;
+    return {false, 0};
   }
   BusyValue result;
   result.busy = storage[target].busy;

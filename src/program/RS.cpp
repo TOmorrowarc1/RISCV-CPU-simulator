@@ -1,4 +1,4 @@
-#include "header/RS.hpp"
+#include "RS.hpp"
 
 ALU_RS &ALU_RS::getInstance() {
   static ALU_RS instance;

@@ -1,4 +1,4 @@
-#include "header/ROB.hpp"
+#include "ROB.hpp"
 
 ROB::ROB() : head_(0), tail_(0) { flush_flag = false; }
 
@@ -25,7 +25,7 @@ uint32_t ROB::getTail() { return tail_.getValue(); }
 
 uint32_t ROB::newIns(ROBInsInfo info) {
   if (flush_flag) {
-    return;
+    return 50;
   }
   uint32_t tail_now = tail_.getValue();
   storage[tail_now].busy.writeValue(true);
@@ -88,7 +88,7 @@ void ROB::listenCDB(BoardCastInfo info) {
 
 ROBCommitInfo ROB::tryCommit() {
   if (flush_flag) {
-    return;
+    return ROBCommitInfo();
   }
   ROBCommitInfo answer;
   uint32_t head_now = head_.getValue();

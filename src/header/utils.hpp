@@ -89,7 +89,7 @@ struct LSBInfo {
 };
 
 struct BoardCastInfo {
-  uint32_t index;
+  uint32_t index = 50;
   uint32_t value;
   uint32_t branch;
   bool flag;
