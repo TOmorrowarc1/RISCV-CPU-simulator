@@ -37,6 +37,9 @@ void StageIssue() {
     auto oprand1_possi = ROB::getInstance().getOperand(oprand1_info.value);
     if (!oprand1_possi.busy) {
       oprand1_info = oprand1_possi;
+    } else if (CDB_info.index == oprand1_info.value) {
+      oprand1_info.busy = false;
+      oprand1_info.value = CDB_info.value;
     }
   }
   if (info.signImmediate) {
@@ -46,6 +49,9 @@ void StageIssue() {
     auto oprand2_possi = ROB::getInstance().getOperand(oprand2_info.value);
     if (!oprand2_possi.busy) {
       oprand1_info = oprand2_possi;
+    } else if (CDB_info.index == oprand2_info.value) {
+      oprand2_info.busy = false;
+      oprand2_info.value = CDB_info.value;
     }
   }
   ROBInsInfo newIns_info;
