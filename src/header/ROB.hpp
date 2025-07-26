@@ -10,23 +10,23 @@ struct ROBItem {
   uint32_t origin_index = 0;
   uint32_t result = 0;
   uint32_t predict_branch = 0;
-  buffer<bool> state = buffer<bool>(false);
-  buffer<bool> busy = buffer<bool>(false);
+  bool state = false;
+  bool busy = false;
   bool predict_taken = false;
 };
 
 class ROB {
 private:
   ROBItem storage[ROBSIZE];
-  buffer<int> head_;
-  buffer<int> tail_;
+  int32_t head_;
+  int32_t tail_;
   bool flush_flag;
 
   ROB();
   bool empty();
   bool full();
-  uint32_t front(uint32_t now);
-  uint32_t next(uint32_t now);
+  int32_t front(int32_t now);
+  int32_t next(int32_t now);
 
 public:
   static ROB &getInstance();

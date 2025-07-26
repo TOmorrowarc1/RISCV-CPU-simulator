@@ -13,6 +13,7 @@ public:
   buffer() = default;
   buffer(T init) { now_value_ = next_value_ = init; }
   T getValue() { return now_value_; }
+  T getTemp() { return next_value_; }
   void writeValue(T target) { next_value_ = target; }
   void refresh() { now_value_ = next_value_; }
 };
