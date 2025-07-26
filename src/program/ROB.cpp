@@ -65,8 +65,7 @@ void ROB::listenCDB(BoardCastInfo info) {
       flush_info.branch = info.branch;
       flush_info.taken = info.flag;
       flush_info.branch_index = next(info.index);
-      // protect possible newIns for this clk.
-      flush_info.tail_index = next(tail_);
+      flush_info.tail_index = tail_;
       ROB_flush.writeValue(flush_info);
       for (int i = flush_info.branch_index;
            isBetween(flush_info.branch_index, flush_info.tail_index, i);
@@ -113,6 +112,7 @@ void ROB::refresh() {
 void ROB::print_out() {
   for (int i = head_; i != tail_; i = next(i)) {
     std::cout << i << ' ' << storage[i].busy << ' ' << storage[i].state << ' '
-              << storage[i].rd << ' ' << storage[i].result << '\n';
+              << storage[i].pc << ' ' << storage[i].rd << ' '
+              << storage[i].result << '\n';
   }
 }
