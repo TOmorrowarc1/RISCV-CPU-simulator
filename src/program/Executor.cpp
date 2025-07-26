@@ -171,7 +171,7 @@ void LSB::newIns(DecodeInsInfo &decode, BusyValue &oprand1, BusyValue &oprand2,
 
 void LSB::listenCDB(BoardCastInfo &info) {
   for (int i = 0; i < LSBSIZE; ++i) {
-    if (storage[i].busy.getValue()) {
+    if (storage[i].busy.getValue() && storage[i].ready.getValue() == 0) {
       if (!storage[i].ready1 && info.index == storage[i].oprand1) {
         storage[i].oprand1 = info.value;
         storage[i].ready1 = true;

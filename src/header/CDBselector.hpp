@@ -5,7 +5,7 @@
 const uint32_t CDBSIZE = 8;
 struct CDBItem {
   BoardCastInfo content;
-  buffer<bool> busy = buffer<bool>(false);
+  bool busy = false;
 };
 
 class CDBSelector {
@@ -18,6 +18,5 @@ public:
   BoardCastInfo tryCommit();
   void newInfo(BoardCastInfo &info);
   void flushReceive(ROBFlushInfo &info);
-  void refresh();
 };
 #endif

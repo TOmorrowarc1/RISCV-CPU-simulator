@@ -10,7 +10,8 @@ int main() {
       "/home/tomorrow_arc1/CS/RISCV-CPU-stimulation/sample/sample.data";
   loadMemory(file_name);
   uint32_t clock = 0;
-  while (!stop_flag) {
+  while (!stop_flag && clock < 10000) {
+    ++clock;
     StageFetch();
     StageIssue();
     StageExecute();

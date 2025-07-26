@@ -114,7 +114,6 @@ void StageBoardcast() {
   auto flush_info = ROB_flush.getValue();
   if (flush_info.branch != 0) {
     CDBSelector::getInstance().flushReceive(flush_info);
-    CDB_result.writeValue(BoardCastInfo());
     return;
   }
   CDB_result.writeValue(CDBSelector::getInstance().tryCommit());
@@ -149,7 +148,6 @@ void RefreshStage() {
   ALU_RS::getInstance().refresh();
   BU_RS::getInstance().refresh();
   LSB::getInstance().refresh();
-  CDBSelector::getInstance().refresh();
   ROB::getInstance().refresh();
 
   print_log();
