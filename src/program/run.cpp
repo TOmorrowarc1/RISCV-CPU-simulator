@@ -33,13 +33,18 @@ void StageIssue() {
   uint32_t index = ROB::getInstance().getTail();
   auto oprand1_info = RegFile::getInstance().tryRead(info.register1);
   auto oprand2_info = RegFile::getInstance().tryRead(info.register2);
-  if (oprand1_info.busy) {
-    auto oprand1_possi = ROB::getInstance().getOperand(oprand1_info.value);
-    if (!oprand1_possi.busy) {
-      oprand1_info = oprand1_possi;
-    } else if (CDB_info.index == oprand1_info.value) {
-      oprand1_info.busy = false;
-      oprand1_info.value = CDB_info.value;
+  if (info.type == InsType::BRANCH && info.branchType == BranchType::JAL) {
+    oprand1_info.busy = false;
+    oprand1_info.value = 0;
+  } else {
+    if (oprand1_info.busy) {
+      auto oprand1_possi = ROB::getInstance().getOperand(oprand1_info.value);
+      if (!oprand1_possi.busy) {
+        oprand1_info = oprand1_possi;
+      } else if (CDB_info.index == oprand1_info.value) {
+        oprand1_info.busy = false;
+        oprand1_info.value = CDB_info.value;
+      }
     }
   }
   if (info.signImmediate) {

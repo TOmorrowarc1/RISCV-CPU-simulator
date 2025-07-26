@@ -113,7 +113,7 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
     break;
   }
   case 0x3: {
-    // for type 'I': load reg2 into reg1+imm.
+    // for type 'I': load reg1+imm into reg2.
     result.type = InsType::LOAD;
     result.immediate = int(ins.command) >> 20;
     result.allow = true;
