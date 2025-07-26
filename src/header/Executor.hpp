@@ -2,7 +2,7 @@
 #define EXECUTE_HPP
 #include "memory.hpp"
 
-const uint32_t LSBSIZE = 8;
+const uint32_t LSBSIZE = 20;
 class ALU {
 private:
   ALU() = default;
