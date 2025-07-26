@@ -55,7 +55,13 @@ void StageIssue() {
     }
   }
   ROBInsInfo newIns_info;
-  newIns_info.rd = info.rd;
+  newIns_info.pc = info.pc;
+  newIns_info.rd =
+      (info.type == InsType::CALC || info.type == InsType::LOAD ||
+       (info.type == InsType::BRANCH && (info.branchType == BranchType::JALR ||
+                                         info.branchType == BranchType::JAL)))
+          ? info.rd
+          : 0;
   newIns_info.predict_branch = info.predict_target_addr;
   newIns_info.predict_taken = info.predict_taken;
   if (info.type != InsType::END) {
