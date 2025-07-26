@@ -30,7 +30,10 @@ struct BU_RS_Item {
 class ALU_RS {
 private:
   ALU_RS_Item storage[RSSIZE];
+  uint32_t head_ = RSSIZE - 1;
+
   ALU_RS() = default;
+  uint32_t next(uint32_t now);
 
 public:
   static ALU_RS &getInstance();
@@ -45,7 +48,10 @@ public:
 class BU_RS {
 private:
   BU_RS_Item storage[RSSIZE];
+  uint32_t head_ = RSSIZE - 1;
+
   BU_RS() = default;
+  uint32_t next(uint32_t now);
 
 public:
   static BU_RS &getInstance();

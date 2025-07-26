@@ -43,7 +43,7 @@ uint32_t ROB::newIns(ROBInsInfo info) {
 
 BusyValue ROB::getOperand(uint32_t index) {
   BusyValue answer;
-  if (storage[index].state.getValue()) {
+  if (storage[index].busy.getValue() && storage[index].state.getValue()) {
     answer.busy = false;
     answer.value = storage[index].result;
   } else {
@@ -62,19 +62,19 @@ void ROB::listenCDB(BoardCastInfo info) {
     if (storage[info.index].predict_taken != info.flag ||
         storage[info.index].predict_branch != info.branch) {
       flush_flag = true;
-      tail_.writeValue(info.index);
+      tail_.writeValue(next(info.index));
       ROBFlushInfo flush_info;
       ROBFlushReg flush_regs;
       uint32_t now_tail = tail_.getValue();
       flush_info.branch = info.branch;
       flush_info.taken = info.flag;
-      flush_info.branch_index = info.index;
+      flush_info.branch_index = next(info.index);
       flush_info.tail_index = now_tail;
       ROB_flush.writeValue(flush_info);
-      for (int i = info.index; i != now_tail; i = next(i)) {
+      for (int i = next(info.index);
+           isBetween(flush_info.branch_index, now_tail, i); i = next(i)) {
         storage[i].busy.writeValue(false);
       }
-      storage[now_tail].busy.writeValue(false);
       for (int i = 0; i < 32; ++i) {
         flush_regs.recover[i] = 51;
       }
@@ -92,8 +92,8 @@ ROBCommitInfo ROB::tryCommit() {
   }
   ROBCommitInfo answer;
   uint32_t head_now = head_.getValue();
-  answer.index = head_now;
-  if (!empty() && storage[head_now].state.getValue()) {
+  if (storage[head_now].busy.getValue() && storage[head_now].state.getValue()) {
+    answer.index = head_now;
     answer.rd = storage[head_now].rd;
     answer.value = storage[head_now].result;
     storage[head_now].busy.writeValue(false);

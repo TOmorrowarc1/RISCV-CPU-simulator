@@ -109,7 +109,7 @@ void StageBoardcast() {
 void StageCommit() {
   auto CDB_info = CDB_result.getValue();
   ROB::getInstance().listenCDB(CDB_info);
-  ROB::getInstance().tryCommit();
+  ROB_commit.writeValue(ROB::getInstance().tryCommit());
 }
 
 void RefreshStage() {

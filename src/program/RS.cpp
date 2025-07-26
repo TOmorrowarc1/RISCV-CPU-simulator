@@ -1,5 +1,7 @@
 #include "RS.hpp"
 
+uint32_t ALU_RS::next(uint32_t now) { return now + 1 == RSSIZE ? 0 : now + 1; }
+
 ALU_RS &ALU_RS::getInstance() {
   static ALU_RS instance;
   return instance;
@@ -8,7 +10,7 @@ ALU_RS &ALU_RS::getInstance() {
 void ALU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
                     BusyValue &oprand2, uint32_t index) {
   bool flag = false;
-  for (int i = 0; i < RSSIZE; ++i) {
+  for (int i = next(head_); i != head_; i = next(i)) {
     if (!storage[i].busy.getValue()) {
       storage[i].busy.writeValue(true);
       storage[i].ready.writeValue(!oprand1.busy && !oprand2.busy);
@@ -45,14 +47,23 @@ void ALU_RS::listenCDB(BoardCastInfo &info) {
 
 ALUInfo ALU_RS::tryCommit() {
   ALUInfo result;
-  for (int i = 0; i < RSSIZE; ++i) {
-    if (storage[i].busy.getValue() && storage[i].ready.getValue()) {
-      result.index = storage[i].ins_index;
-      result.oprand1 = storage[i].oprand1;
-      result.oprand2 = storage[i].oprand2;
-      result.type = storage[i].type;
-      storage[i].busy.writeValue(false);
-      break;
+  if (storage[head_].busy.getValue() && storage[head_].ready.getValue()) {
+    result.index = storage[head_].ins_index;
+    result.oprand1 = storage[head_].oprand1;
+    result.oprand2 = storage[head_].oprand2;
+    result.type = storage[head_].type;
+    storage[head_].busy.writeValue(false);
+    head_ = next(head_);
+  } else {
+    for (int i = next(head_); i != head_; i = next(i)) {
+      if (storage[i].busy.getValue() && storage[i].ready.getValue()) {
+        result.index = storage[i].ins_index;
+        result.oprand1 = storage[i].oprand1;
+        result.oprand2 = storage[i].oprand2;
+        result.type = storage[i].type;
+        storage[i].busy.writeValue(false);
+        break;
+      }
     }
   }
   return result;
@@ -74,6 +85,8 @@ void ALU_RS::refresh() {
   }
 }
 
+uint32_t BU_RS::next(uint32_t now) { return now + 1 == RSSIZE ? 0 : now + 1; }
+
 BU_RS &BU_RS::getInstance() {
   static BU_RS instance;
   return instance;
@@ -82,7 +95,7 @@ BU_RS &BU_RS::getInstance() {
 void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
                    BusyValue &oprand2, uint32_t index) {
   bool flag = false;
-  for (int i = 0; i < RSSIZE; ++i) {
+  for (int i = next(head_); i != head_; i = next(i)) {
     if (!storage[i].busy.getValue()) {
       storage[i].busy.writeValue(true);
       storage[i].ready.writeValue(!oprand1.busy && !oprand2.busy);
@@ -121,16 +134,26 @@ void BU_RS::listenCDB(BoardCastInfo &info) {
 
 BUInfo BU_RS::tryCommit() {
   BUInfo result;
-  for (int i = 0; i < RSSIZE; ++i) {
-    if (storage[i].busy.getValue() && storage[i].ready.getValue()) {
-      result.index = storage[i].ins_index;
-      result.type = storage[i].type;
-      result.oprand1 = storage[i].oprand1;
-      result.oprand2 = storage[i].oprand2;
-      result.immdiate = storage[i].immediate;
-      result.pc = storage[i].pc;
-      storage[i].busy.writeValue(false);
-      break;
+  if (storage[head_].busy.getValue() && storage[head_].ready.getValue()) {
+    result.index = storage[head_].ins_index;
+    result.type = storage[head_].type;
+    result.oprand1 = storage[head_].oprand1;
+    result.oprand2 = storage[head_].oprand2;
+    result.immdiate = storage[head_].immediate;
+    result.pc = storage[head_].pc;
+    storage[head_].busy.writeValue(false);
+  } else {
+    for (int i = next(head_); i != head_; i = next(i)) {
+      if (storage[i].busy.getValue() && storage[i].ready.getValue()) {
+        result.index = storage[i].ins_index;
+        result.type = storage[i].type;
+        result.oprand1 = storage[i].oprand1;
+        result.oprand2 = storage[i].oprand2;
+        result.immdiate = storage[i].immediate;
+        result.pc = storage[i].pc;
+        storage[i].busy.writeValue(false);
+        break;
+      }
     }
   }
   return result;
