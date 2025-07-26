@@ -35,14 +35,18 @@ void StageIssue() {
   auto oprand2_info = RegFile::getInstance().tryRead(info.register2);
   if (oprand1_info.busy) {
     auto oprand1_possi = ROB::getInstance().getOperand(oprand1_info.value);
-    oprand1_info.value =
-        oprand1_possi.busy ? oprand1_info.value : oprand1_possi.value;
+    if (!oprand1_possi.busy) {
+      oprand1_info = oprand1_possi;
+    }
   }
   if (info.signImmediate) {
     oprand2_info.busy = false;
     oprand2_info.value = info.immediate;
   } else if (oprand2_info.busy) {
-    oprand2_info = ROB::getInstance().getOperand(oprand2_info.value);
+    auto oprand2_possi = ROB::getInstance().getOperand(oprand2_info.value);
+    if (!oprand2_possi.busy) {
+      oprand1_info = oprand2_possi;
+    }
   }
   ROBInsInfo newIns_info;
   newIns_info.rd = info.rd;
@@ -87,14 +91,20 @@ void StageExecute() {
     if (isBetween(flush_info.branch_index, flush_info.tail_index,
                   alu_info.index)) {
       ALU_result.writeValue(BoardCastInfo());
+    } else {
+      ALU_result.writeValue(ALU::getInstance().execute(alu_info));
     }
     if (isBetween(flush_info.branch_index, flush_info.tail_index,
                   branch_info.index)) {
       BU_result.writeValue(BoardCastInfo());
+    } else {
+      BU_result.writeValue(BU::getInstance().execute(branch_info));
     }
     if (isBetween(flush_info.branch_index, flush_info.tail_index,
                   lsb_result.index)) {
       LSB_result.writeValue(BoardCastInfo());
+    } else {
+      LSB_result.writeValue(lsb_result);
     }
     return;
   } else {
