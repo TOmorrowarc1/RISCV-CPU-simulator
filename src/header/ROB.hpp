@@ -35,6 +35,7 @@ public:
   BusyValue getOperand(uint32_t index);
   ROBCommitInfo tryCommit();
   void listenCDB(BoardCastInfo info);
+  void print_out();
   void refresh();
 };
 

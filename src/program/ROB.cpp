@@ -1,4 +1,5 @@
 #include "ROB.hpp"
+#include <iostream>
 
 ROB::ROB() : head_(0), tail_(0) { flush_flag = false; }
 
@@ -69,10 +70,12 @@ void ROB::listenCDB(BoardCastInfo info) {
       flush_info.branch = info.branch;
       flush_info.taken = info.flag;
       flush_info.branch_index = next(info.index);
-      flush_info.tail_index = now_tail;
+      // protect possible newIns for this clk.
+      flush_info.tail_index = next(now_tail);
       ROB_flush.writeValue(flush_info);
-      for (int i = next(info.index);
-           isBetween(flush_info.branch_index, now_tail, i); i = next(i)) {
+      for (int i = flush_info.branch_index;
+           isBetween(flush_info.branch_index, flush_info.tail_index, i);
+           i = next(i)) {
         storage[i].busy.writeValue(false);
       }
       for (int i = 0; i < 32; ++i) {
@@ -116,4 +119,13 @@ void ROB::refresh() {
   ROB_commit.writeValue(ROBCommitInfo());
   ROB_flush.writeValue(ROBFlushInfo());
   ROB_flush_reg.writeValue(ROBFlushReg());
+}
+
+void ROB::print_out() {
+  uint32_t over_tail_now = next(tail_.getValue());
+  for (int i = head_.getValue(); i != over_tail_now; i = next(i)) {
+    std::cout << i << ' ' << storage[i].busy.getValue() << ' '
+              << storage[i].state.getValue() << ' ' << storage[i].rd << ' '
+              << storage[i].result << '\n';
+  }
 }

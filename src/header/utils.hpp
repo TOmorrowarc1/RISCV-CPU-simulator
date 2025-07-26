@@ -126,7 +126,6 @@ extern buffer<BranchPredictInfo> PC_predict;
 
 extern buffer<ALUInfo> ALU_ready;
 extern buffer<BUInfo> BU_ready;
-extern buffer<LSBInfo> LSB_ready;
 
 extern buffer<BoardCastInfo> ALU_result;
 extern buffer<BoardCastInfo> BU_result;

@@ -16,4 +16,6 @@ void StageCommit();
 
 void RefreshStage();
 
+void print_log();
+
 #endif

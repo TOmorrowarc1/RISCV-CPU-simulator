@@ -34,7 +34,9 @@ void StageIssue() {
   auto oprand1_info = RegFile::getInstance().tryRead(info.register1);
   auto oprand2_info = RegFile::getInstance().tryRead(info.register2);
   if (oprand1_info.busy) {
-    oprand1_info = ROB::getInstance().getOperand(oprand1_info.value);
+    auto oprand1_possi = ROB::getInstance().getOperand(oprand1_info.value);
+    oprand1_info.value =
+        oprand1_possi.busy ? oprand1_info.value : oprand1_possi.value;
   }
   if (info.signImmediate) {
     oprand2_info.busy = false;
@@ -76,33 +78,45 @@ void StageIssue() {
 }
 
 void StageExecute() {
-  if (ROB_flush.getValue().branch != 0) {
-    ALU_result.writeValue(BoardCastInfo());
-    BU_result.writeValue(BoardCastInfo());
-    LSB_result.writeValue(BoardCastInfo());
-    return;
-  }
   auto alu_info = ALU_ready.getValue();
   auto branch_info = BU_ready.getValue();
   auto commit_info = ROB_commit.getValue();
-  ALU_result.writeValue(ALU::getInstance().execute(alu_info));
-  BU_result.writeValue(BU::getInstance().execute(branch_info));
-  LSB_result.writeValue(LSB::getInstance().tryExecute(commit_info));
+  auto flush_info = ROB_flush.getValue();
+  auto lsb_result = LSB::getInstance().tryExecute(commit_info);
+  if (flush_info.branch != 0) {
+    if (isBetween(flush_info.branch_index, flush_info.tail_index,
+                  alu_info.index)) {
+      ALU_result.writeValue(BoardCastInfo());
+    }
+    if (isBetween(flush_info.branch_index, flush_info.tail_index,
+                  branch_info.index)) {
+      BU_result.writeValue(BoardCastInfo());
+    }
+    if (isBetween(flush_info.branch_index, flush_info.tail_index,
+                  lsb_result.index)) {
+      LSB_result.writeValue(BoardCastInfo());
+    }
+    return;
+  } else {
+    ALU_result.writeValue(ALU::getInstance().execute(alu_info));
+    BU_result.writeValue(BU::getInstance().execute(branch_info));
+    LSB_result.writeValue(lsb_result);
+  }
 }
 
 void StageBoardcast() {
-  auto flush_info = ROB_flush.getValue();
-  if (flush_info.branch != 0) {
-    CDBSelector::getInstance().flushReceive(flush_info);
-    CDB_result.writeValue(BoardCastInfo());
-    return;
-  }
   auto alu_result = ALU_result.getValue();
   auto branch_result = BU_result.getValue();
   auto ls_result = LSB_result.getValue();
   CDBSelector::getInstance().newInfo(alu_result);
   CDBSelector::getInstance().newInfo(branch_result);
   CDBSelector::getInstance().newInfo(ls_result);
+  auto flush_info = ROB_flush.getValue();
+  if (flush_info.branch != 0) {
+    CDBSelector::getInstance().flushReceive(flush_info);
+    CDB_result.writeValue(BoardCastInfo());
+    return;
+  }
   CDB_result.writeValue(CDBSelector::getInstance().tryCommit());
 }
 
@@ -138,8 +152,35 @@ void RefreshStage() {
   CDBSelector::getInstance().refresh();
   ROB::getInstance().refresh();
 
+  print_log();
+
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();
     std::cout << RegFile::getInstance().tryRead(commit_check.rd).value;
   }
+}
+
+void print_log() {
+  auto ins_info = Fetch_command.getValue();
+  auto alu_ready = ALU_ready.getValue();
+  auto bu_ready = BU_ready.getValue();
+  auto alu_result = ALU_result.getValue();
+  auto bu_result = BU_result.getValue();
+  auto ls_result = LSB_result.getValue();
+  auto board = CDB_result.getValue();
+  auto commit = ROB_commit.getValue();
+  auto flush = ROB_flush.getValue();
+
+  std::cout << "ins_pc: " << ins_info.ins_pc << '\n';
+  std::cout << "alu_ready: " << alu_ready.index << '\n';
+  std::cout << "bu_ready: " << bu_ready.index << '\n';
+  std::cout << "alu_result: " << alu_result.index << '\n';
+  std::cout << "bu_result: " << bu_result.index << '\n';
+  std::cout << "LSB_result: " << ls_result.index << '\n';
+  std::cout << "board_info: " << board.index << '\n';
+  std::cout << "commit_info: " << commit.index << '\n';
+  std::cout << "flush_info: " << flush.branch_index << ' ' << flush.tail_index
+            << ' ' << flush.branch << ' ' << flush.taken << '\n';
+  ROB::getInstance().print_out();
+  std::cout << '\n';
 }

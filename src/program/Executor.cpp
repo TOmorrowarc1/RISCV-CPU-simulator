@@ -4,6 +4,7 @@ ALU &ALU::getInstance() {
   static ALU instance;
   return instance;
 }
+
 BoardCastInfo ALU::execute(ALUInfo &order) {
   BoardCastInfo result;
   result.index = order.index;
@@ -109,11 +110,12 @@ BoardCastInfo BU::execute(BUInfo &order) {
     }
     break;
   case BranchType::JAL:
-    // Is prediction of the JAL and JALR meaningful?
+    result.value = order.pc + 4;
     result.flag = true;
     result.branch = order.pc + order.immdiate;
     break;
   case BranchType::JALR:
+    result.value = order.pc + 4;
     result.flag = true;
     result.branch = order.oprand1 + order.immdiate;
     break;
@@ -244,11 +246,7 @@ void LSB::flushReceive(ROBFlushInfo &info) {
     storage[tail_new].busy.writeValue(true);
     tail_new = next(tail_new);
   }
-  if (tail_new != head_now) {
-    tail_.writeValue(front(tail_new));
-  } else {
-    tail_.writeValue(head_now);
-  }
+  tail_.writeValue(tail_new);
 }
 
 void LSB::refresh() {
@@ -256,4 +254,6 @@ void LSB::refresh() {
     storage[i].busy.refresh();
     storage[i].ready.refresh();
   }
+  head_.refresh();
+  tail_.refresh();
 }
