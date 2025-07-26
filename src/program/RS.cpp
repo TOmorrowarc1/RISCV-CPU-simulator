@@ -10,7 +10,8 @@ ALU_RS &ALU_RS::getInstance() {
 void ALU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
                     BusyValue &oprand2, uint32_t index) {
   bool flag = false;
-  for (int i = next(head_); i != head_; i = next(i)) {
+  int i = head_;
+  do {
     if (!storage[i].busy.getValue()) {
       storage[i].busy.writeValue(true);
       storage[i].ready.writeValue(!oprand1.busy && !oprand2.busy);
@@ -23,7 +24,8 @@ void ALU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
       flag = true;
       break;
     }
-  }
+    i = next(i);
+  } while (i != head_);
   if (!flag) {
     throw std::runtime_error("too much ins in RS.");
   }
@@ -95,7 +97,8 @@ BU_RS &BU_RS::getInstance() {
 void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
                    BusyValue &oprand2, uint32_t index) {
   bool flag = false;
-  for (int i = next(head_); i != head_; i = next(i)) {
+  int i = head_;
+  do {
     if (!storage[i].busy.getValue()) {
       storage[i].busy.writeValue(true);
       storage[i].ready.writeValue(!oprand1.busy && !oprand2.busy);
@@ -110,7 +113,8 @@ void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
       flag = true;
       break;
     }
-  }
+    i = next(i);
+  } while (i != head_);
   if (!flag) {
     throw std::runtime_error("too much ins in RS.");
   }
