@@ -4,15 +4,11 @@
 void StageFetch() {
   PC_predict.writeValue(PC::getInstance().branchPredict());
   Fetch_command.writeValue(PC::getInstance().fetchCommand());
-  if (ROB_flush.getValue().branch != 0) {
-    auto flush_info = ROB_flush.getValue();
-    PC::getInstance().flushReceive(flush_info);
-  }
 }
 
 void StageIssue() {
-  if (ROB_flush.getValue().branch != 0) {
-    auto flush_info = ROB_flush.getValue();
+  auto flush_info = ROB_flush.getValue();
+  if (flush_info.branch != 0) {
     auto flush_regs = ROB_flush_reg.getValue();
     RegFile::getInstance().flushRecieve(flush_regs);
     ALU_RS::getInstance().flushReceive(flush_info);
@@ -95,8 +91,8 @@ void StageExecute() {
 }
 
 void StageBoardcast() {
-  if (ROB_flush.getValue().branch != 0) {
-    auto flush_info = ROB_flush.getValue();
+  auto flush_info = ROB_flush.getValue();
+  if (flush_info.branch != 0) {
     CDBSelector::getInstance().flushReceive(flush_info);
     CDB_result.writeValue(BoardCastInfo());
     return;
@@ -128,6 +124,12 @@ void RefreshStage() {
   ROB_commit.refresh();
   ROB_flush.refresh();
   ROB_flush_reg.refresh();
+
+  // 旁路：组合逻辑，以新状态更新新状态。
+  auto flush = ROB_flush.getValue();
+  if (flush.branch != 0) {
+    PC::getInstance().flushReceive(flush);
+  }
 
   PC::getInstance().refresh();
   ALU_RS::getInstance().refresh();

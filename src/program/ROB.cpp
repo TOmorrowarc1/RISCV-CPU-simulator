@@ -76,7 +76,7 @@ void ROB::listenCDB(BoardCastInfo info) {
       }
       storage[now_tail].busy.writeValue(false);
       for (int i = 0; i < 32; ++i) {
-        flush_regs.recover[i] = 50;
+        flush_regs.recover[i] = 51;
       }
       for (int i = now_tail; i != info.index; i = front(i)) {
         flush_regs.recover[storage[i].rd] = storage[i].origin_index;

@@ -35,10 +35,10 @@ void RegFile::commitReceive(ROBCommitInfo &info) {
 
 void RegFile::flushRecieve(ROBFlushReg &regs) {
   for (int i = 0; i < 32; ++i) {
-    if (regs.recover[i] != 50) {
-      storage[i].ins_index = regs.recover[i];
-    } else {
+    if (regs.recover[i] == 50) {
       storage[i].busy = false;
+    } else if (regs.recover[i] != 51) {
+      storage[i].ins_index = regs.recover[i];
     }
   }
 }
