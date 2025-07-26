@@ -3,6 +3,8 @@
 #include "memory.hpp"
 
 const uint32_t BATSIZE = 1 << 20;
+const uint32_t COVER = (-1) << 20;
+
 class JumpState {
 private:
   uint32_t status = 1;
@@ -17,7 +19,7 @@ public:
 class PC {
 private:
   buffer<uint32_t> pc_;
-  JumpState predictor[BATSIZE];
+  JumpState BAT_[BATSIZE];
   PC();
 
 public:
