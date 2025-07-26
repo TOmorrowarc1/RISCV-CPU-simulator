@@ -6,6 +6,7 @@ const int ROBSIZE = 50;
 
 // Items store in ROB, the "state" records if it is complete.
 struct ROBItem {
+  uint32_t pc = 0;
   uint32_t rd = 0;
   uint32_t origin_index = 0;
   uint32_t result = 0;

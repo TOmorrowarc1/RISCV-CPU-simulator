@@ -97,6 +97,7 @@ struct BoardCastInfo {
 };
 
 struct ROBInsInfo {
+  uint32_t pc = 0;
   uint32_t rd = 0;
   uint32_t origin_index = 50;
   uint32_t predict_branch = 0;
@@ -110,6 +111,7 @@ struct ROBCommitInfo {
 };
 
 struct ROBFlushInfo {
+  uint32_t pc = 0;
   uint32_t branch = 0;
   uint32_t branch_index = 50;
   uint32_t tail_index = 50;

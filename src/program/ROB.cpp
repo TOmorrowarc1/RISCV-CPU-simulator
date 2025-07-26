@@ -23,6 +23,7 @@ uint32_t ROB::newIns(ROBInsInfo info) {
   uint32_t tail_now = tail_;
   storage[tail_].busy = true;
   storage[tail_].state = false;
+  storage[tail_].pc = info.pc;
   storage[tail_].rd = info.rd;
   if (info.predict_branch == -114514) {
     storage[tail_].state = true;
@@ -60,6 +61,7 @@ void ROB::listenCDB(BoardCastInfo info) {
       flush_flag = true;
       ROBFlushInfo flush_info;
       ROBFlushReg flush_regs;
+      flush_info.pc = storage[info.index].pc;
       flush_info.branch = info.branch;
       flush_info.taken = info.flag;
       flush_info.branch_index = next(info.index);

@@ -2,7 +2,7 @@
 #define RS_HPP
 #include "utils.hpp"
 
-const uint32_t RSSIZE = 8;
+const uint32_t RSSIZE = 20;
 struct ALU_RS_Item {
   CalcType type;
   uint32_t ins_index;
