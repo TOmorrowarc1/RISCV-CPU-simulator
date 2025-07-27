@@ -43,12 +43,12 @@ struct LSBItem {
 class LSB {
 private:
   LSBItem storage[LSBSIZE];
-  buffer<uint32_t> head_;
-  buffer<uint32_t> tail_;
+  buffer<int32_t> head_;
+  buffer<int32_t> tail_;
 
-  LSB() = default;
-  uint32_t front(uint32_t now);
-  uint32_t next(uint32_t now);
+  LSB();
+  int32_t front(int32_t now);
+  int32_t next(int32_t now);
 
 public:
   static LSB &getInstance();

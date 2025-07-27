@@ -125,10 +125,13 @@ BoardCastInfo BU::execute(BUInfo &order) {
   return result;
 }
 
-uint32_t LSB::front(uint32_t now) {
-  return now - 1 < 0 ? LSBSIZE - 1 : now - 1;
+LSB::LSB() {
+  head_ = buffer<int32_t>(0);
+  tail_ = buffer<int32_t>(0);
 }
-uint32_t LSB::next(uint32_t now) { return now + 1 == LSBSIZE ? 0 : now + 1; }
+
+int32_t LSB::front(int32_t now) { return now - 1 < 0 ? LSBSIZE - 1 : now - 1; }
+int32_t LSB::next(int32_t now) { return now + 1 == LSBSIZE ? 0 : now + 1; }
 
 LSB &LSB::getInstance() {
   static LSB instance;
@@ -137,7 +140,7 @@ LSB &LSB::getInstance() {
 
 void LSB::newIns(DecodeInsInfo &decode, BusyValue &oprand1, BusyValue &oprand2,
                  uint32_t index) {
-  uint32_t tail_now = tail_.getValue();
+  int32_t tail_now = tail_.getValue();
   storage[tail_now].busy.writeValue(true);
   storage[tail_now].ins_index = index;
   storage[tail_now].type = decode.type;
@@ -194,16 +197,15 @@ void LSB::listenCDB(BoardCastInfo &info) {
 
 BoardCastInfo LSB::tryExecute(ROBCommitInfo &info) {
   BoardCastInfo result;
-  uint32_t head_now = head_.getValue();
+  int32_t head_now = head_.getValue();
   if (storage[head_now].busy.getValue()) {
     switch (storage[head_now].ready.getValue()) {
-    case 0:
-      return result;
     case 1:
       storage[head_now].ready.writeValue(2);
       if (storage[head_now].type == InsType::STORE) {
         result.index = storage[head_now].ins_index;
         result.value = storage[head_now].target;
+        return result;
       }
       break;
     case 2:
@@ -213,6 +215,7 @@ BoardCastInfo LSB::tryExecute(ROBCommitInfo &info) {
                                                   storage[head_now].size);
         storage[head_now].busy.writeValue(false);
         head_.writeValue(next(head_now));
+        return result;
       } else {
         if (info.index == storage[head_now].ins_index) {
           Memory::getInstance().store(storage[head_now].target,
@@ -220,18 +223,30 @@ BoardCastInfo LSB::tryExecute(ROBCommitInfo &info) {
                                       storage[head_now].oprand2);
           storage[head_now].busy.writeValue(false);
           head_.writeValue(next(head_now));
+          return result;
         }
       }
       break;
+    default:
+      break;
+    }
+  }
+  for (int i = next(head_now); i != head_now; i = next(i)) {
+    if (storage[i].busy.getValue() && storage[i].ready.getValue() == 1 &&
+        storage[i].type == InsType::STORE) {
+      storage[i].ready.writeValue(2);
+      result.index = storage[i].ins_index;
+      result.value = storage[i].target;
+      return result;
     }
   }
   return result;
 }
 
 void LSB::flushReceive(ROBFlushInfo &info) {
-  uint32_t head_now = head_.getValue();
-  uint32_t tail_now = tail_.getValue();
-  uint32_t tail_new = head_now;
+  int32_t head_now = head_.getValue();
+  int32_t tail_now = tail_.getValue();
+  int32_t tail_new = head_now;
   for (int i = 0; i < LSBSIZE; ++i) {
     storage[i].busy.writeValue(false);
   }
