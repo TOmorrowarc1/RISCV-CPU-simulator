@@ -179,7 +179,7 @@ void RefreshStage() {
   LSB::getInstance().refresh();
   ROB::getInstance().refresh();
 
-  //print_log();
+  print_log();
 
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();
