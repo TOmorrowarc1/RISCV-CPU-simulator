@@ -155,7 +155,6 @@ void RefreshStage() {
   stall_flag = ALU_stall || BU_stall || ROB_stall;
   Fetch_command.refresh();
   PC_predict.refresh();
-
   ALU_ready.refresh();
   BU_ready.refresh();
   ALU_result.refresh();

@@ -7,10 +7,10 @@ bool loadMemory(const std::string &filename);
 
 int main() {
   std::string file_name =
-      "/home/tomorrow_arc1/CS/RISCV-CPU-stimulation/testcases/expr.data";
+      "/home/tomorrow_arc1/CS/RISCV-CPU-stimulation/testcases/basicopt1.data";
   loadMemory(file_name);
   uint32_t clock = 0;
-  while (!stop_flag && clock < 10000) {
+  while (!stop_flag && clock < 100000) {
     ++clock;
     StageFetch();
     StageIssue();

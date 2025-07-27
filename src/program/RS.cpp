@@ -24,14 +24,11 @@ void ALU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
     }
     i = next(i);
   } while (i != head_);
-  if (next(i) == head_) {
-    ALU_stall = true;
-  }
 }
 
 void ALU_RS::listenCDB(BoardCastInfo &info) {
   for (int i = 0; i < RSSIZE; ++i) {
-    if (storage[i].busy.getValue()) {
+    if (storage[i].busy.getValue() && !storage[i].ready.getValue()) {
       if (!storage[i].ready1 && info.index == storage[i].oprand1) {
         storage[i].oprand1 = info.value;
         storage[i].ready1 = true;
@@ -54,7 +51,6 @@ ALUInfo ALU_RS::tryCommit() {
     result.type = storage[head_].type;
     storage[head_].busy.writeValue(false);
     head_ = next(head_);
-    ALU_stall = false;
   } else {
     for (int i = next(head_); i != head_; i = next(i)) {
       if (storage[i].busy.getValue() && storage[i].ready.getValue()) {
@@ -66,6 +62,10 @@ ALUInfo ALU_RS::tryCommit() {
         break;
       }
     }
+  }
+  ALU_stall = true;
+  for (int i = 0; i < RSSIZE && ALU_stall; ++i) {
+    ALU_stall = storage[i].busy.getTemp();
   }
   return result;
 }
@@ -124,14 +124,11 @@ void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
     }
     i = next(i);
   } while (i != head_);
-  if (next(i) == head_) {
-    BU_stall = true;
-  }
 }
 
 void BU_RS::listenCDB(BoardCastInfo &info) {
   for (int i = 0; i < RSSIZE; ++i) {
-    if (storage[i].busy.getValue()) {
+    if (storage[i].busy.getValue() && !storage[i].ready.getValue()) {
       if (!storage[i].ready1 && info.index == storage[i].oprand1) {
         storage[i].oprand1 = info.value;
         storage[i].ready1 = true;
@@ -169,6 +166,10 @@ BUInfo BU_RS::tryCommit() {
         break;
       }
     }
+  }
+  BU_stall = true;
+  for (int i = 0; i < RSSIZE && BU_stall; ++i) {
+    BU_stall = storage[i].busy.getTemp();
   }
   return result;
 }
