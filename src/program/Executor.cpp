@@ -223,7 +223,6 @@ BoardCastInfo LSB::tryExecute(ROBCommitInfo &info) {
                                       storage[head_now].oprand2);
           storage[head_now].busy.writeValue(false);
           head_.writeValue(next(head_now));
-          return result;
         }
       }
       break;
