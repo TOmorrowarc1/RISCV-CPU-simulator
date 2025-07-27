@@ -3,7 +3,7 @@
 #include "memory.hpp"
 
 const uint32_t BATSIZE = 1 << 20;
-const uint32_t COVER = (-1) << 20;
+const uint32_t COVER = 0xfffff;
 
 class JumpState {
 private:

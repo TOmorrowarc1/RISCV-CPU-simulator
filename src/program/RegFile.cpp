@@ -7,7 +7,7 @@ RegFile &RegFile::getInstance() {
 
 BusyValue RegFile::tryRead(uint32_t target) {
   if (target == 0) {
-    return {false, 0};
+    return {0, false};
   }
   BusyValue result;
   result.busy = storage[target].busy;
@@ -18,7 +18,7 @@ BusyValue RegFile::tryRead(uint32_t target) {
 
 BusyValue RegFile::tryWrite(uint32_t target, uint32_t ins_index) {
   if (target == 0) {
-    return {false, 0};
+    return {50, false};
   }
   BusyValue result;
   result.busy = storage[target].busy;

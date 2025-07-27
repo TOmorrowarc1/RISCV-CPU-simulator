@@ -32,9 +32,9 @@ void PC::refresh() { pc_.refresh(); }
 
 void JumpState::refreshCondition(bool if_jump) {
   if (if_jump) {
-    status = status == 3 ? status + 1 : status;
+    status = status != 3 ? status + 1 : status;
   } else {
-    status = status == 0 ? status - 1 : status;
+    status = status != 0 ? status - 1 : status;
   }
 }
 
