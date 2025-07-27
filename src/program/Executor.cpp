@@ -235,7 +235,7 @@ void LSB::flushReceive(ROBFlushInfo &info) {
   }
   while (!isBetween(info.branch_index, info.tail_index,
                     storage[tail_new].ins_index) &&
-         isBetween(head_now, tail_now, tail_new)) {
+         tail_new != tail_now) {
     storage[tail_new].busy.writeValue(true);
     tail_new = next(tail_new);
   }

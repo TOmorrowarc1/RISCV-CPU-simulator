@@ -56,8 +56,9 @@ void ROB::listenCDB(BoardCastInfo info) {
   storage[info.index].state = true;
   storage[info.index].result = info.value;
   if (info.branch != 0) {
-    if (storage[info.index].predict_taken != info.flag ||
-        storage[info.index].predict_branch != info.branch) {
+    if (storage[info.index].busy &&
+        (storage[info.index].predict_taken != info.flag ||
+         storage[info.index].predict_branch != info.branch)) {
       flush_flag = true;
       ROBFlushInfo flush_info;
       ROBFlushReg flush_regs;
@@ -98,6 +99,11 @@ ROBCommitInfo ROB::tryCommit() {
       stop_flag = true;
     }
     head_ = next(head_);
+    for (int i = head_; i != tail_; i = next(i)) {
+      if (storage[i].origin_index == answer.index) {
+        storage[i].origin_index = 50;
+      }
+    }
   }
   return answer;
 }
