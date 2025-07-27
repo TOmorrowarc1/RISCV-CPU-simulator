@@ -53,7 +53,7 @@ void StageIssue() {
   } else if (oprand2_info.busy) {
     auto oprand2_possi = ROB::getInstance().getOperand(oprand2_info.value);
     if (!oprand2_possi.busy) {
-      oprand1_info = oprand2_possi;
+      oprand2_info = oprand2_possi;
     } else if (CDB_info.index == oprand2_info.value) {
       oprand2_info.busy = false;
       oprand2_info.value = CDB_info.value;
@@ -184,7 +184,7 @@ void RefreshStage() {
 }
 
 void print_log() {
-  auto ins_info = Fetch_command.getValue();
+  auto ins_info = Fetch_command.getValue();  
   auto alu_ready = ALU_ready.getValue();
   auto bu_ready = BU_ready.getValue();
   auto alu_result = ALU_result.getValue();
