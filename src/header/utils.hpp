@@ -7,6 +7,7 @@
 extern bool stall_flag;
 extern bool ALU_stall;
 extern bool BU_stall;
+extern bool LSB_stall;
 extern bool ROB_stall;
 extern bool stop_flag;
 template <typename T> class buffer {

@@ -57,6 +57,7 @@ public:
   void listenCDB(BoardCastInfo &info);
   BoardCastInfo tryExecute(ROBCommitInfo &info);
   void flushReceive(ROBFlushInfo &info);
+  bool fullCheck();
   void refresh();
 };
 

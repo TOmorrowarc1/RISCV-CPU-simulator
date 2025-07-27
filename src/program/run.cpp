@@ -152,7 +152,9 @@ void StageCommit() {
 }
 
 void RefreshStage() {
-  stall_flag = ALU_stall || BU_stall || ROB_stall;
+  LSB_stall = LSB::getInstance().fullCheck();
+  ROB_stall = ROB::getInstance().fullCheck();
+  stall_flag = ALU_stall || BU_stall || LSB_stall || ROB_stall;
   Fetch_command.refresh();
   PC_predict.refresh();
   ALU_ready.refresh();

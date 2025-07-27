@@ -31,11 +31,7 @@ uint32_t ROB::newIns(ROBInsInfo info) {
   storage[tail_].origin_index = info.origin_index;
   storage[tail_].predict_branch = info.predict_branch;
   storage[tail_].predict_taken = info.predict_taken;
-  if (next(tail_) == head_) {
-    ROB_stall = true;
-  } else {
-    tail_ = next(tail_);
-  }
+  tail_ = next(tail_);
   return tail_now;
 }
 
@@ -108,10 +104,11 @@ ROBCommitInfo ROB::tryCommit() {
         storage[i].origin_index = 50;
       }
     }
-    ROB_stall = false;
   }
   return answer;
 }
+
+bool ROB::fullCheck() { return head_ == tail_ && storage[head_].busy; }
 
 void ROB::refresh() {
   flush_flag = false;

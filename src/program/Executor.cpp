@@ -259,6 +259,10 @@ void LSB::flushReceive(ROBFlushInfo &info) {
   tail_.writeValue(tail_new);
 }
 
+bool LSB::fullCheck() {
+  return head_.getTemp() == tail_.getTemp() && storage[0].busy.getTemp();
+}
+
 void LSB::refresh() {
   for (int i = 0; i < LSBSIZE; ++i) {
     storage[i].busy.refresh();
