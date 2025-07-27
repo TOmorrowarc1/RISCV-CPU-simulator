@@ -1,6 +1,9 @@
 #include "utils.hpp"
 
 bool stop_flag = false;
+bool ALU_stall = false;
+bool BU_stall = false;
+bool ROB_stall = false;
 bool stall_flag = false;
 
 bool isBetween(uint32_t front, uint32_t end, uint32_t target) {

@@ -32,7 +32,7 @@ uint32_t ROB::newIns(ROBInsInfo info) {
   storage[tail_].predict_branch = info.predict_branch;
   storage[tail_].predict_taken = info.predict_taken;
   if (next(tail_) == head_) {
-    stall_flag = true;
+    ROB_stall = true;
   } else {
     tail_ = next(tail_);
   }
@@ -108,6 +108,7 @@ ROBCommitInfo ROB::tryCommit() {
         storage[i].origin_index = 50;
       }
     }
+    ROB_stall = false;
   }
   return answer;
 }

@@ -26,67 +26,69 @@ void StageIssue() {
     return;
   }
 
-  // Decode.
-  auto info = Decoder::getInstance().parse(Fetch_command.getValue(),
-                                           PC_predict.getValue());
-  uint32_t index = ROB::getInstance().getTail();
-  auto oprand1_info = RegFile::getInstance().tryRead(info.register1);
-  auto oprand2_info = RegFile::getInstance().tryRead(info.register2);
-  if (info.signPC) {
-    oprand1_info.busy = false;
-    oprand1_info.value = info.pc;
-  } else {
-    if (oprand1_info.busy) {
-      auto oprand1_possi = ROB::getInstance().getOperand(oprand1_info.value);
-      if (!oprand1_possi.busy) {
-        oprand1_info = oprand1_possi;
-      } else if (CDB_info.index == oprand1_info.value) {
-        oprand1_info.busy = false;
-        oprand1_info.value = CDB_info.value;
+  if (!stall_flag) {
+    // Decode.
+    auto info = Decoder::getInstance().parse(Fetch_command.getValue(),
+                                             PC_predict.getValue());
+    uint32_t index = ROB::getInstance().getTail();
+    auto oprand1_info = RegFile::getInstance().tryRead(info.register1);
+    auto oprand2_info = RegFile::getInstance().tryRead(info.register2);
+    if (info.signPC) {
+      oprand1_info.busy = false;
+      oprand1_info.value = info.pc;
+    } else {
+      if (oprand1_info.busy) {
+        auto oprand1_possi = ROB::getInstance().getOperand(oprand1_info.value);
+        if (!oprand1_possi.busy) {
+          oprand1_info = oprand1_possi;
+        } else if (CDB_info.index == oprand1_info.value) {
+          oprand1_info.busy = false;
+          oprand1_info.value = CDB_info.value;
+        }
       }
     }
-  }
-  if (info.signImmediate) {
-    oprand2_info.busy = false;
-    oprand2_info.value = info.immediate;
-  } else if (oprand2_info.busy) {
-    auto oprand2_possi = ROB::getInstance().getOperand(oprand2_info.value);
-    if (!oprand2_possi.busy) {
-      oprand2_info = oprand2_possi;
-    } else if (CDB_info.index == oprand2_info.value) {
+    if (info.signImmediate) {
       oprand2_info.busy = false;
-      oprand2_info.value = CDB_info.value;
+      oprand2_info.value = info.immediate;
+    } else if (oprand2_info.busy) {
+      auto oprand2_possi = ROB::getInstance().getOperand(oprand2_info.value);
+      if (!oprand2_possi.busy) {
+        oprand2_info = oprand2_possi;
+      } else if (CDB_info.index == oprand2_info.value) {
+        oprand2_info.busy = false;
+        oprand2_info.value = CDB_info.value;
+      }
     }
-  }
-  ROBInsInfo newIns_info;
-  newIns_info.pc = info.pc;
-  newIns_info.predict_branch = info.predict_target_addr;
-  newIns_info.predict_taken = info.predict_taken;
-  if (info.allow) {
-    if (info.type != InsType::END) {
-      auto write_info = RegFile::getInstance().tryWrite(info.rd, index);
-      newIns_info.origin_index = write_info.busy ? write_info.value : 50;
+    ROBInsInfo newIns_info;
+    newIns_info.pc = info.pc;
+    newIns_info.predict_branch = info.predict_target_addr;
+    newIns_info.predict_taken = info.predict_taken;
+    if (info.allow) {
+      if (info.type != InsType::END) {
+        auto write_info = RegFile::getInstance().tryWrite(info.rd, index);
+        newIns_info.origin_index = write_info.busy ? write_info.value : 50;
+      }
+      newIns_info.rd = info.rd;
     }
-    newIns_info.rd = info.rd;
-  }
-  ROB::getInstance().newIns(newIns_info);
+    ROB::getInstance().newIns(newIns_info);
 
-  // Dispatch.
-  switch (info.type) {
-  case InsType::CALC:
-    ALU_RS::getInstance().newIns(info, oprand1_info, oprand2_info, index);
-    break;
-  case InsType::BRANCH:
-    BU_RS::getInstance().newIns(info, oprand1_info, oprand2_info, index);
-    break;
-  case InsType::LOAD:
-    LSB::getInstance().newIns(info, oprand1_info, oprand2_info, index);
-    break;
-  case InsType::STORE:
-    LSB::getInstance().newIns(info, oprand1_info, oprand2_info, index);
-    break;
-  default:
-    break;
+    // Dispatch.
+    switch (info.type) {
+    case InsType::CALC:
+      ALU_RS::getInstance().newIns(info, oprand1_info, oprand2_info, index);
+      break;
+    case InsType::BRANCH:
+      BU_RS::getInstance().newIns(info, oprand1_info, oprand2_info, index);
+      break;
+    case InsType::LOAD:
+      LSB::getInstance().newIns(info, oprand1_info, oprand2_info, index);
+      break;
+    case InsType::STORE:
+      LSB::getInstance().newIns(info, oprand1_info, oprand2_info, index);
+      break;
+    default:
+      break;
+    }
   }
 
   // Launch.
@@ -150,8 +152,10 @@ void StageCommit() {
 }
 
 void RefreshStage() {
+  stall_flag = ALU_stall || BU_stall || ROB_stall;
   Fetch_command.refresh();
   PC_predict.refresh();
+
   ALU_ready.refresh();
   BU_ready.refresh();
   ALU_result.refresh();
@@ -176,7 +180,6 @@ void RefreshStage() {
 
   print_log();
 
-  stall_flag = false;
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();
     std::cout << (RegFile::getInstance().tryRead(commit_check.rd).value & 0xff);

@@ -9,7 +9,6 @@ ALU_RS &ALU_RS::getInstance() {
 
 void ALU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
                     BusyValue &oprand2, uint32_t index) {
-  bool flag = false;
   int i = head_;
   do {
     if (!storage[i].busy.getValue()) {
@@ -21,13 +20,12 @@ void ALU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
       storage[i].ready1 = !oprand1.busy;
       storage[i].oprand2 = oprand2.value;
       storage[i].ready2 = !oprand2.busy;
-      flag = true;
       break;
     }
     i = next(i);
   } while (i != head_);
-  if (!flag) {
-    stall_flag = true;
+  if (next(i) == head_) {
+    ALU_stall = true;
   }
 }
 
@@ -56,6 +54,7 @@ ALUInfo ALU_RS::tryCommit() {
     result.type = storage[head_].type;
     storage[head_].busy.writeValue(false);
     head_ = next(head_);
+    ALU_stall = false;
   } else {
     for (int i = next(head_); i != head_; i = next(i)) {
       if (storage[i].busy.getValue() && storage[i].ready.getValue()) {
@@ -96,7 +95,6 @@ BU_RS &BU_RS::getInstance() {
 
 void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
                    BusyValue &oprand2, uint32_t index) {
-  bool flag = false;
   int i = head_;
   do {
     if (!storage[i].busy.getValue()) {
@@ -122,13 +120,12 @@ void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
         storage[i].ready2 = !oprand2.busy;
         storage[i].ready.writeValue(!oprand1.busy && !oprand2.busy);
       }
-      flag = true;
       break;
     }
     i = next(i);
   } while (i != head_);
-  if (!flag) {
-    stall_flag = true;
+  if (next(i) == head_) {
+    BU_stall = true;
   }
 }
 
@@ -158,6 +155,7 @@ BUInfo BU_RS::tryCommit() {
     result.immdiate = storage[head_].immediate;
     result.pc = storage[head_].pc;
     storage[head_].busy.writeValue(false);
+    BU_stall = false;
   } else {
     for (int i = next(head_); i != head_; i = next(i)) {
       if (storage[i].busy.getValue() && storage[i].ready.getValue()) {
