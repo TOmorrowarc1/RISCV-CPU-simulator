@@ -27,7 +27,7 @@ void ALU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
     i = next(i);
   } while (i != head_);
   if (!flag) {
-    throw std::runtime_error("too much ins in RS.");
+    stall_flag = true;
   }
 }
 
@@ -128,7 +128,7 @@ void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
     i = next(i);
   } while (i != head_);
   if (!flag) {
-    throw std::runtime_error("too much ins in RS.");
+    stall_flag = true;
   }
 }
 

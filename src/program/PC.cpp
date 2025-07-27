@@ -28,7 +28,11 @@ void PC::flushReceive(ROBFlushInfo &info) {
   BAT_[info.pc & COVER].refreshCondition(info.taken);
 }
 
-void PC::refresh() { pc_.refresh(); }
+void PC::refresh() {
+  if (!stall_flag) {
+    pc_.refresh();
+  }
+}
 
 void JumpState::refreshCondition(bool if_jump) {
   if (if_jump) {

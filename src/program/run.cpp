@@ -176,6 +176,7 @@ void RefreshStage() {
 
   print_log();
 
+  stall_flag = false;
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();
     std::cout << (RegFile::getInstance().tryRead(commit_check.rd).value & 0xff);

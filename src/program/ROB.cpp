@@ -31,9 +31,10 @@ uint32_t ROB::newIns(ROBInsInfo info) {
   storage[tail_].origin_index = info.origin_index;
   storage[tail_].predict_branch = info.predict_branch;
   storage[tail_].predict_taken = info.predict_taken;
-  tail_ = next(tail_);
-  if (tail_ == head_) {
-    throw std::runtime_error("filled ROB");
+  if (next(tail_) == head_) {
+    stall_flag = true;
+  } else {
+    tail_ = next(tail_);
   }
   return tail_now;
 }
