@@ -234,7 +234,6 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
     result.type = InsType::BRANCH;
     result.branchType = BranchType::JAL;
     result.allow = true;
-    result.signImmediate = true;
     result.immediate = int(((((ins.command >> 12) & 0xff) << 12) |
                             (((ins.command >> 20) & 0x1) << 11) |
                             (((ins.command >> 21) & 0x3ff) << 1) |

@@ -101,15 +101,27 @@ void BU_RS::newIns(DecodeInsInfo &decode, BusyValue &oprand1,
   do {
     if (!storage[i].busy.getValue()) {
       storage[i].busy.writeValue(true);
-      storage[i].ready.writeValue(!oprand1.busy && !oprand2.busy);
-      storage[i].ins_index = index;
       storage[i].type = decode.branchType;
-      storage[i].oprand1 = oprand1.value;
-      storage[i].ready1 = !oprand1.busy;
-      storage[i].oprand2 = oprand2.value;
-      storage[i].ready2 = !oprand2.busy;
-      storage[i].immediate = decode.immediate;
+      storage[i].ins_index = index;
       storage[i].pc = decode.pc;
+      storage[i].immediate = decode.immediate;
+      switch (decode.branchType) {
+      case BranchType::JAL:
+        storage[i].ready.writeValue(true);
+        break;
+      case BranchType::JALR:
+        storage[i].oprand1 = oprand1.value;
+        storage[i].ready1 = !oprand1.busy;
+        storage[i].ready2 = true;
+        storage[i].ready.writeValue(!oprand1.busy);
+        break;
+      default:
+        storage[i].oprand1 = oprand1.value;
+        storage[i].ready1 = !oprand1.busy;
+        storage[i].oprand2 = oprand2.value;
+        storage[i].ready2 = !oprand2.busy;
+        storage[i].ready.writeValue(!oprand1.busy && !oprand2.busy);
+      }
       flag = true;
       break;
     }

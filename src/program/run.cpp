@@ -33,9 +33,9 @@ void StageIssue() {
   uint32_t index = ROB::getInstance().getTail();
   auto oprand1_info = RegFile::getInstance().tryRead(info.register1);
   auto oprand2_info = RegFile::getInstance().tryRead(info.register2);
-  if (info.type == InsType::BRANCH && info.branchType == BranchType::JAL) {
+  if (info.signPC) {
     oprand1_info.busy = false;
-    oprand1_info.value = 0;
+    oprand1_info.value = info.pc;
   } else {
     if (oprand1_info.busy) {
       auto oprand1_possi = ROB::getInstance().getOperand(oprand1_info.value);
@@ -61,16 +61,11 @@ void StageIssue() {
   }
   ROBInsInfo newIns_info;
   newIns_info.pc = info.pc;
-  newIns_info.rd =
-      (info.type == InsType::CALC || info.type == InsType::LOAD ||
-       (info.type == InsType::BRANCH && (info.branchType == BranchType::JALR ||
-                                         info.branchType == BranchType::JAL)))
-          ? info.rd
-          : 0;
   newIns_info.predict_branch = info.predict_target_addr;
   newIns_info.predict_taken = info.predict_taken;
-  if (info.type != InsType::END) {
+  if (info.allow) {
     auto write_info = RegFile::getInstance().tryWrite(info.rd, index);
+    newIns_info.rd = info.rd;
     newIns_info.origin_index = write_info.busy ? write_info.value : 50;
   }
   ROB::getInstance().newIns(newIns_info);
