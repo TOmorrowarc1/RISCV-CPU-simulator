@@ -1,5 +1,4 @@
 #include "run.hpp"
-#include <iostream>
 
 void StageFetch() {
   PC_predict.writeValue(PC::getInstance().branchPredict());
@@ -14,7 +13,7 @@ void StageIssue() {
   ALU_RS::getInstance().listenCDB(CDB_info);
   BU_RS::getInstance().listenCDB(CDB_info);
   LSB::getInstance().listenCDB(CDB_info);
-  
+
   auto flush_info = ROB_flush.getValue();
   if (flush_info.branch != 0) {
     auto flush_regs = ROB_flush_reg.getValue();
@@ -184,7 +183,7 @@ void RefreshStage() {
 }
 
 void print_log() {
-  auto ins_info = Fetch_command.getValue();  
+  auto ins_info = Fetch_command.getValue();
   auto alu_ready = ALU_ready.getValue();
   auto bu_ready = BU_ready.getValue();
   auto alu_result = ALU_result.getValue();

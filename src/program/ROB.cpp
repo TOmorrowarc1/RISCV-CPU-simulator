@@ -69,7 +69,7 @@ void ROB::listenCDB(BoardCastInfo info) {
       flush_info.branch = info.branch;
       flush_info.taken = info.flag;
       flush_info.branch_index = next(info.index);
-      flush_info.tail_index = tail_;
+      flush_info.tail_index = front(tail_);
       ROB_flush.writeValue(flush_info);
       for (int i = flush_info.branch_index;
            isBetween(flush_info.branch_index, flush_info.tail_index, i);
@@ -79,7 +79,7 @@ void ROB::listenCDB(BoardCastInfo info) {
       for (int i = 0; i < 32; ++i) {
         flush_regs.recover[i] = 51;
       }
-      for (int i = tail_; i != info.index; i = front(i)) {
+      for (int i = front(tail_); i != info.index; i = front(i)) {
         flush_regs.recover[storage[i].rd] = storage[i].origin_index;
       }
       ROB_flush_reg.writeValue(flush_regs);

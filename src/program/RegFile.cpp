@@ -30,7 +30,14 @@ BusyValue RegFile::tryWrite(uint32_t target, uint32_t ins_index) {
 
 void RegFile::commitReceive(ROBCommitInfo &info) {
   storage[info.rd].value = info.value;
-  storage[info.rd].busy = !(storage[info.rd].ins_index == info.index);
+  if (storage[info.rd].ins_index == info.index) {
+    storage[info.rd].busy = false;
+    storage[info.rd].ins_index = 50;
+  }
+  if (info.rd == 10) {
+    int a = 1;
+    std::cout << "result of 10: " << info.value << ' ' << info.index << '\n';
+  }
 }
 
 void RegFile::flushRecieve(ROBFlushReg &regs) {

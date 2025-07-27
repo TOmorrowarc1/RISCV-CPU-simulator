@@ -1,7 +1,9 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
+#include <iostream>
 #include <stdexcept>
 #include <stdint.h>
+
 
 extern bool stop_flag;
 template <typename T> class buffer {
