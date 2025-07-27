@@ -7,9 +7,14 @@ void StageFetch() {
 }
 
 void StageIssue() {
+  // Refresh.
   auto commit_info = ROB_commit.getValue();
+  auto CDB_info = CDB_result.getValue();
   RegFile::getInstance().commitReceive(commit_info);
-
+  ALU_RS::getInstance().listenCDB(CDB_info);
+  BU_RS::getInstance().listenCDB(CDB_info);
+  LSB::getInstance().listenCDB(CDB_info);
+  
   auto flush_info = ROB_flush.getValue();
   if (flush_info.branch != 0) {
     auto flush_regs = ROB_flush_reg.getValue();
@@ -21,12 +26,6 @@ void StageIssue() {
     BU_ready.writeValue(BUInfo());
     return;
   }
-
-  // Refresh.
-  auto CDB_info = CDB_result.getValue();
-  ALU_RS::getInstance().listenCDB(CDB_info);
-  BU_RS::getInstance().listenCDB(CDB_info);
-  LSB::getInstance().listenCDB(CDB_info);
 
   // Decode.
   auto info = Decoder::getInstance().parse(Fetch_command.getValue(),
