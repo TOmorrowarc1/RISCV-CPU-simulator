@@ -3,6 +3,7 @@
 bool stop_flag = false;
 bool ALU_stall = false;
 bool BU_stall = false;
+bool LSB_stall = false;
 bool ROB_stall = false;
 bool stall_flag = false;
 
