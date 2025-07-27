@@ -9,7 +9,7 @@ void StageFetch() {
 void StageIssue() {
   auto commit_info = ROB_commit.getValue();
   RegFile::getInstance().commitReceive(commit_info);
-  
+
   auto flush_info = ROB_flush.getValue();
   if (flush_info.branch != 0) {
     auto flush_regs = ROB_flush_reg.getValue();
@@ -65,9 +65,11 @@ void StageIssue() {
   newIns_info.predict_branch = info.predict_target_addr;
   newIns_info.predict_taken = info.predict_taken;
   if (info.allow) {
-    auto write_info = RegFile::getInstance().tryWrite(info.rd, index);
+    if (info.type != InsType::END) {
+      auto write_info = RegFile::getInstance().tryWrite(info.rd, index);
+      newIns_info.origin_index = write_info.busy ? write_info.value : 50;
+    }
     newIns_info.rd = info.rd;
-    newIns_info.origin_index = write_info.busy ? write_info.value : 50;
   }
   ROB::getInstance().newIns(newIns_info);
 
@@ -178,7 +180,7 @@ void RefreshStage() {
 
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();
-    std::cout << RegFile::getInstance().tryRead(commit_check.rd).value;
+    std::cout << (RegFile::getInstance().tryRead(commit_check.rd).value & 0xff);
   }
 }
 

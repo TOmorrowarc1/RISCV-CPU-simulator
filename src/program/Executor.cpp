@@ -211,15 +211,17 @@ BoardCastInfo LSB::tryExecute(ROBCommitInfo &info) {
         result.index = storage[head_now].ins_index;
         result.value = Memory::getInstance().load(storage[head_now].target,
                                                   storage[head_now].size);
+        storage[head_now].busy.writeValue(false);
+        head_.writeValue(next(head_now));
       } else {
         if (info.index == storage[head_now].ins_index) {
           Memory::getInstance().store(storage[head_now].target,
                                       storage[head_now].size,
                                       storage[head_now].oprand2);
+          storage[head_now].busy.writeValue(false);
+          head_.writeValue(next(head_now));
         }
       }
-      storage[head_now].busy.writeValue(false);
-      head_.writeValue(next(head_now));
       break;
     }
   }
