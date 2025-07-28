@@ -101,7 +101,6 @@ void StageExecute() {
   auto branch_info = BU_ready.getValue();
   auto commit_info = ROB_commit.getValue();
   auto flush_info = ROB_flush.getValue();
-  auto lsb_result = LSB::getInstance().tryExecute(commit_info);
   if (flush_info.branch != 0) {
     if (isBetween(flush_info.branch_index, flush_info.tail_index,
                   alu_info.index)) {
@@ -115,17 +114,11 @@ void StageExecute() {
     } else {
       BU_result.writeValue(BU::getInstance().execute(branch_info));
     }
-    if (isBetween(flush_info.branch_index, flush_info.tail_index,
-                  lsb_result.index)) {
-      LSB_result.writeValue(BoardCastInfo());
-    } else {
-      LSB_result.writeValue(lsb_result);
-    }
-    return;
+    LSB_result.writeValue(BoardCastInfo());
   } else {
     ALU_result.writeValue(ALU::getInstance().execute(alu_info));
     BU_result.writeValue(BU::getInstance().execute(branch_info));
-    LSB_result.writeValue(lsb_result);
+    LSB_result.writeValue(LSB::getInstance().tryExecute(commit_info));
   }
 }
 
@@ -179,7 +172,7 @@ void RefreshStage() {
   LSB::getInstance().refresh();
   ROB::getInstance().refresh();
 
-  //print_log();
+  print_log();
 
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();

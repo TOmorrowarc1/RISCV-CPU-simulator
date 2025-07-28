@@ -198,7 +198,7 @@ void LSB::listenCDB(BoardCastInfo &info) {
 BoardCastInfo LSB::tryExecute(ROBCommitInfo &info) {
   BoardCastInfo result;
   int32_t head_now = head_.getValue();
-  if (storage[head_now].busy.getTemp()) {
+  if (storage[head_now].busy.getValue()) {
     switch (storage[head_now].ready.getValue()) {
     case 1:
       storage[head_now].ready.writeValue(2);
