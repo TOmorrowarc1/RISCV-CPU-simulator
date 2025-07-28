@@ -26,6 +26,9 @@ void loadMemory() {
   uint32_t data;
   while (std::getline(std::cin, line)) {
     std::stringstream lineStream(line);
+    if (line.empty()) {
+      break;
+    }
     if (line[0] == '@') {
       lineStream.get();
       if (!(lineStream >> std::hex >> currentAddress)) {
