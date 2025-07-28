@@ -59,6 +59,7 @@ public:
   void flushReceive(ROBFlushInfo &info);
   bool fullCheck();
   void refresh();
+  void print_out();
 };
 
 #endif

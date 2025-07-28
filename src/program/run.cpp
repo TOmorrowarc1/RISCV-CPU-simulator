@@ -172,7 +172,7 @@ void RefreshStage() {
   LSB::getInstance().refresh();
   ROB::getInstance().refresh();
 
-  print_log();
+  //print_log();
 
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();
@@ -201,6 +201,7 @@ void print_log() {
   std::cout << "commit_info: " << commit.index << '\n';
   std::cout << "flush_info: " << flush.branch_index << ' ' << flush.tail_index
             << ' ' << flush.branch << ' ' << flush.taken << '\n';
+  LSB::getInstance().print_out();
   ROB::getInstance().print_out();
   std::cout << '\n';
 }

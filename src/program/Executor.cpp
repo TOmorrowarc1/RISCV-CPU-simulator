@@ -199,16 +199,14 @@ BoardCastInfo LSB::tryExecute(ROBCommitInfo &info) {
   BoardCastInfo result;
   int32_t head_now = head_.getValue();
   if (storage[head_now].busy.getValue()) {
-    switch (storage[head_now].ready.getValue()) {
-    case 1:
+    if (storage[head_now].ready.getValue() == 1) {
       storage[head_now].ready.writeValue(2);
       if (storage[head_now].type == InsType::STORE) {
         result.index = storage[head_now].ins_index;
         result.value = storage[head_now].target;
         return result;
       }
-      break;
-    case 2:
+    } else if (storage[head_now].ready.getValue() == 2) {
       if (storage[head_now].type == InsType::LOAD) {
         result.index = storage[head_now].ins_index;
         result.value = Memory::getInstance().load(storage[head_now].target,
@@ -225,9 +223,6 @@ BoardCastInfo LSB::tryExecute(ROBCommitInfo &info) {
           head_.writeValue(next(head_now));
         }
       }
-      break;
-    default:
-      break;
     }
   }
   for (int i = next(head_now); i != head_now; i = next(i)) {
@@ -251,7 +246,7 @@ void LSB::flushReceive(ROBFlushInfo &info) {
   }
   while (!isBetween(info.branch_index, info.tail_index,
                     storage[tail_new].ins_index) &&
-         tail_new != tail_now) {
+         storage[tail_new].busy.getValue()) {
     storage[tail_new].busy.writeValue(true);
     tail_new = next(tail_new);
   }
@@ -269,4 +264,12 @@ void LSB::refresh() {
   }
   head_.refresh();
   tail_.refresh();
+}
+
+void LSB::print_out() {
+  for (int i = head_.getTemp(); i != tail_.getTemp(); i = next(i)) {
+    std::cout << storage[i].busy.getTemp() << ' ' << storage[i].ready.getTemp()
+              << ' ' << storage[i].ins_index << '\n';
+  }
+  std::cout << "LSB finish.\n";
 }
