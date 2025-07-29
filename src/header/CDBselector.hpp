@@ -2,7 +2,7 @@
 #define CDB_HPP
 #include "utils.hpp"
 
-const uint32_t CDBSIZE = 8;
+const uint32_t CDBSIZE = 20;
 struct CDBItem {
   BoardCastInfo content;
   bool busy = false;
