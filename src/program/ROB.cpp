@@ -59,7 +59,7 @@ void ROB::listenCDB(BoardCastInfo &info) {
   storage[info.index].state.writeValue(true);
   storage[info.index].result = info.value;
   if (info.branch != 0) {
-    if (storage[info.index].busy.getValue() &&
+    if (storage[info.index].busy.getTemp() &&
         (storage[info.index].predict_taken != info.flag ||
          storage[info.index].predict_branch != info.branch)) {
       ROBFlushInfo flush_info;

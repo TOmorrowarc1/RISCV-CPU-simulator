@@ -35,11 +35,11 @@ void RegFile::commitReceive(ROBCommitInfo &info) {
     storage[info.rd].busy = false;
     storage[info.rd].ins_index = 50;
   }
-  if (info.rd == 10) {
+  /*if (info.rd == 10) {
     ++count;
     std::cout << "result of 10: " << count << ' ' << info.value << ' '
               << info.index << '\n';
-  }
+  }*/
 }
 
 void RegFile::flushRecieve(ROBFlushReg &regs) {
