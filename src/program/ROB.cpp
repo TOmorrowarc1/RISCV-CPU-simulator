@@ -73,6 +73,14 @@ void ROB::listenCDB(BoardCastInfo &info) {
   }
 }
 
+void ROB::commitReceive(ROBCommitInfo& info) {
+  for (int i = head_.getValue(); i != tail_.getValue(); i = next(i)) {
+    if (storage[i].origin_index == info.index) {
+      storage[i].origin_index = ROBSIZE;
+    }
+  }
+}
+
 ROBCommitInfo ROB::tryCommit() {
   if (ROB_flush.getTemp().branch != 0) {
     return ROBCommitInfo();
@@ -88,11 +96,6 @@ ROBCommitInfo ROB::tryCommit() {
       stop_flag = true;
     }
     head_.writeValue(next(head_now));
-    for (int i = head_now; i != tail_.getTemp(); i = next(i)) {
-      if (storage[i].origin_index == answer.index) {
-        storage[i].origin_index = ROBSIZE;
-      }
-    }
   }
   return answer;
 }

@@ -40,6 +40,7 @@ public:
   ROBFlushReg flushRegAsk(uint32_t begin, uint32_t end);
 
   void listenCDB(BoardCastInfo &info);
+  void commitReceive(ROBCommitInfo &info);
   ROBCommitInfo tryCommit();
   void flushReceive(ROBFlushInfo &info);
 
