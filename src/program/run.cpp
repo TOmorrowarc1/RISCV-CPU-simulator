@@ -67,7 +67,10 @@ void StageIssue() {
     if (info.allow) {
       if (info.type != InsType::END) {
         auto write_info = RegFile::getInstance().tryWrite(info.rd, index);
-        newIns_info.origin_index = write_info.busy ? write_info.value : 50;
+        newIns_info.origin_index =
+            (write_info.busy && write_info.value != CDB_info.index)
+                ? write_info.value
+                : 50;
       }
       newIns_info.rd = info.rd;
     }
@@ -176,7 +179,7 @@ void RefreshStage() {
   LSB::getInstance().refresh();
   ROB::getInstance().refresh();
 
-  //print_log();
+  print_log();
 
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();
