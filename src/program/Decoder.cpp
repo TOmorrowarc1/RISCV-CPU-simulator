@@ -76,7 +76,7 @@ DecodeInsInfo Decoder::parse(BasicInsInfo ins, BranchPredictInfo branch) {
       result.calcType = CalcType::ADD;
       if (result.immediate == 255) {
         result.type = InsType::END;
-        result.predict_target_addr = -114514;
+        result.predict_target_addr = ENDPC;
       }
       break;
     case 0x1:

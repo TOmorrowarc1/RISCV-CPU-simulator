@@ -73,7 +73,7 @@ ALUInfo ALU_RS::tryCommit() {
 void ALU_RS::flushReceive(ROBFlushInfo &info) {
   for (int i = 0; i < RSSIZE; ++i) {
     if (storage[i].busy.getValue() &&
-        isBetween(info.branch_index, info.tail_index, storage[i].ins_index)) {
+        isBetween(info.branch_index, info.final_index, storage[i].ins_index)) {
       storage[i].busy.writeValue(false);
     }
   }
@@ -177,7 +177,7 @@ BUInfo BU_RS::tryCommit() {
 void BU_RS::flushReceive(ROBFlushInfo &info) {
   for (int i = 0; i < RSSIZE; ++i) {
     if (storage[i].busy.getValue() &&
-        isBetween(info.branch_index, info.tail_index, storage[i].ins_index)) {
+        isBetween(info.branch_index, info.final_index, storage[i].ins_index)) {
       storage[i].busy.writeValue(false);
     }
   }

@@ -46,7 +46,7 @@ BoardCastInfo CDBSelector::tryCommit() {
 void CDBSelector::flushReceive(ROBFlushInfo &info) {
   for (int i = 0; i < CDBSIZE; ++i) {
     if (storage[i].busy) {
-      if (isBetween(info.branch_index, info.tail_index,
+      if (isBetween(info.branch_index, info.final_index,
                     storage[i].content.index)) {
         storage[i].busy = false;
       }

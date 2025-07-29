@@ -1,12 +1,5 @@
 #include "utils.hpp"
 
-bool stop_flag = false;
-bool ALU_stall = false;
-bool BU_stall = false;
-bool LSB_stall = false;
-bool ROB_stall = false;
-bool stall_flag = false;
-
 bool isBetween(uint32_t front, uint32_t end, uint32_t target) {
   if (front <= end) {
     return target >= front && target <= end;
@@ -29,3 +22,10 @@ buffer<BoardCastInfo> CDB_result;
 buffer<ROBCommitInfo> ROB_commit;
 buffer<ROBFlushInfo> ROB_flush;
 buffer<ROBFlushReg> ROB_flush_reg;
+
+bool stop_flag = false;
+bool ALU_stall = false;
+bool BU_stall = false;
+bool LSB_stall = false;
+bool ROB_stall = false;
+bool stall_flag = false;
