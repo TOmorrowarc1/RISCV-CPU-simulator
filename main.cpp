@@ -10,7 +10,7 @@ int main() {
       "/home/tomorrow_arc1/CS/RISCV-CPU-stimulation/testcases/naive.data";
   loadMemory(file_name);
   uint32_t clock = 0;
-  while (!stop_flag && clock < 10000) {
+  while (!stop_flag && clock < 1000) {
     ++clock;
 
     StageFetch();

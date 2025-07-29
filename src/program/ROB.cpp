@@ -27,7 +27,7 @@ void ROB::newIns(ROBInsInfo info) {
   storage[tail_now].state.writeValue(false);
   storage[tail_now].pc = info.pc;
   storage[tail_now].rd = info.rd;
-  if (info.pc == ENDPC) {
+  if (info.predict_branch == ENDPC) {
     storage[tail_now].state.writeValue(true);
   }
   storage[tail_now].origin_index = info.origin_index;
@@ -96,7 +96,7 @@ ROBCommitInfo ROB::tryCommit() {
     answer.rd = storage[head_now].rd;
     answer.value = storage[head_now].result;
     storage[head_now].busy.writeValue(false);
-    if (storage[head_now].pc == ENDPC) {
+    if (storage[head_now].predict_branch == ENDPC) {
       stop_flag = true;
     }
     head_.writeValue(next(head_now));
