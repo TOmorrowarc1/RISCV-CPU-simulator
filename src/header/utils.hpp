@@ -4,12 +4,6 @@
 #include <stdexcept>
 #include <stdint.h>
 
-extern bool stall_flag;
-extern bool ALU_stall;
-extern bool BU_stall;
-extern bool LSB_stall;
-extern bool ROB_stall;
-extern bool stop_flag;
 template <typename T> class buffer {
 private:
   T now_value_;
@@ -120,7 +114,7 @@ struct ROBFlushInfo {
   uint32_t pc = 0;
   uint32_t branch = 0;
   uint32_t branch_index = 50;
-  uint32_t tail_index = 50;
+  uint32_t final_index = 50;
   bool taken = false;
 };
 
@@ -145,5 +139,15 @@ extern buffer<BoardCastInfo> CDB_result;
 extern buffer<ROBCommitInfo> ROB_commit;
 extern buffer<ROBFlushInfo> ROB_flush;
 extern buffer<ROBFlushReg> ROB_flush_reg;
+
+extern bool stall_flag;
+extern bool ALU_stall;
+extern bool BU_stall;
+extern bool LSB_stall;
+extern bool ROB_stall;
+extern bool stop_flag;
+
+constexpr int32_t ROBSIZE = 50;
+constexpr uint32_t ENDPC = -114514;
 
 #endif

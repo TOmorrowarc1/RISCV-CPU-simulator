@@ -244,7 +244,7 @@ void LSB::flushReceive(ROBFlushInfo &info) {
   for (int i = 0; i < LSBSIZE; ++i) {
     storage[i].busy.writeValue(false);
   }
-  while (!isBetween(info.branch_index, info.tail_index,
+  while (!isBetween(info.branch_index, info.final_index,
                     storage[tail_new].ins_index) &&
          storage[tail_new].busy.getValue()) {
     storage[tail_new].busy.writeValue(true);

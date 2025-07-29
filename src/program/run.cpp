@@ -102,13 +102,13 @@ void StageExecute() {
   auto commit_info = ROB_commit.getValue();
   auto flush_info = ROB_flush.getValue();
   if (flush_info.branch != 0) {
-    if (isBetween(flush_info.branch_index, flush_info.tail_index,
+    if (isBetween(flush_info.branch_index, flush_info.final_index,
                   alu_info.index)) {
       ALU_result.writeValue(BoardCastInfo());
     } else {
       ALU_result.writeValue(ALU::getInstance().execute(alu_info));
     }
-    if (isBetween(flush_info.branch_index, flush_info.tail_index,
+    if (isBetween(flush_info.branch_index, flush_info.final_index,
                   branch_info.index)) {
       BU_result.writeValue(BoardCastInfo());
     } else {
@@ -172,7 +172,7 @@ void RefreshStage() {
   LSB::getInstance().refresh();
   ROB::getInstance().refresh();
 
-  //print_log();
+  print_log();
 
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();
@@ -199,7 +199,7 @@ void print_log() {
   std::cout << "LSB_result: " << ls_result.index << '\n';
   std::cout << "board_info: " << board.index << '\n';
   std::cout << "commit_info: " << commit.index << '\n';
-  std::cout << "flush_info: " << flush.branch_index << ' ' << flush.tail_index
+  std::cout << "flush_info: " << flush.branch_index << ' ' << flush.final_index
             << ' ' << flush.branch << ' ' << flush.taken << '\n';
   LSB::getInstance().print_out();
   ROB::getInstance().print_out();
