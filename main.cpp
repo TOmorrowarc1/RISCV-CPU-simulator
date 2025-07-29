@@ -13,10 +13,10 @@ int main() {
   while (!stop_flag) {
     ++clock;
     StageFetch();
+    StageCommit();
     StageIssue();
     StageExecute();
     StageBoardcast();
-    StageCommit();
     RefreshStage();
   }
   return 0;
