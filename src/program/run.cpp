@@ -143,9 +143,10 @@ void StageCommit() {
   auto flush_info = ROB_flush.getValue();
   auto Commit_info = ROB_commit.getValue();
   auto CDB_info = CDB_result.getValue();
-  ROB::getInstance().commitReceive(Commit_info);
   if (flush_info.branch != 0) {
     ROB::getInstance().flushReceive(flush_info);
+  } else {
+    ROB::getInstance().commitReceive(Commit_info);
   }
   ROB::getInstance().listenCDB(CDB_info);
   ROB_commit.writeValue(ROB::getInstance().tryCommit());
@@ -178,7 +179,7 @@ void RefreshStage() {
   LSB::getInstance().refresh();
   ROB::getInstance().refresh();
 
-  //print_log();
+  // print_log();
 
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();
