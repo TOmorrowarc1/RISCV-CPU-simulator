@@ -16,7 +16,8 @@ void StageIssue() {
 
   auto flush_info = ROB_flush.getValue();
   if (flush_info.branch != 0) {
-    auto flush_regs = ROB_flush_reg.getValue();
+    auto flush_regs = ROB::getInstance().flushRegAsk(flush_info.branch_index,
+                                                     flush_info.final_index);
     RegFile::getInstance().flushRecieve(flush_regs);
     ALU_RS::getInstance().flushReceive(flush_info);
     BU_RS::getInstance().flushReceive(flush_info);
@@ -139,7 +140,11 @@ void StageBoardcast() {
 }
 
 void StageCommit() {
+  auto flush_info = ROB_flush.getValue();
   auto CDB_info = CDB_result.getValue();
+  if (flush_info.branch != 0) {
+    ROB::getInstance().flushReceive(flush_info);
+  }
   ROB::getInstance().listenCDB(CDB_info);
   ROB_commit.writeValue(ROB::getInstance().tryCommit());
 }
@@ -158,7 +163,6 @@ void RefreshStage() {
   CDB_result.refresh();
   ROB_commit.refresh();
   ROB_flush.refresh();
-  ROB_flush_reg.refresh();
 
   // 旁路：组合逻辑，以新状态更新新状态。
   auto flush = ROB_flush.getValue();
