@@ -12,7 +12,6 @@ int main() {
   uint32_t clock = 0;
   while (!stop_flag && clock < 1000) {
     ++clock;
-
     StageFetch();
     StageIssue();
     StageExecute();

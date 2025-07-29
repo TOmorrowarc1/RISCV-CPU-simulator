@@ -1,7 +1,7 @@
 #include "ROB.hpp"
 #include <iostream>
 
-ROB::ROB() : head_(0), tail_(0) { flush_flag = false; }
+ROB::ROB() : head_(0), tail_(0) {}
 
 int32_t ROB::front(int32_t now) { return now - 1 < 0 ? ROBSIZE - 1 : now - 1; }
 int32_t ROB::next(int32_t now) { return now + 1 == ROBSIZE ? 0 : now + 1; }
@@ -14,14 +14,6 @@ ROB &ROB::getInstance() {
 uint32_t ROB::getTail() { return tail_.getValue(); }
 
 void ROB::newIns(ROBInsInfo info) {
-  if (flush_flag) {
-    auto flush_regs = ROB_flush_reg.getTemp();
-    if (info.rd != 0) {
-      flush_regs.recover[info.rd] = info.origin_index;
-    }
-    ROB_flush_reg.writeValue(flush_regs);
-    return;
-  }
   int32_t tail_now = tail_.getValue();
   storage[tail_now].busy.writeValue(true);
   storage[tail_now].state.writeValue(false);
@@ -47,7 +39,20 @@ BusyValue ROB::getOperand(uint32_t index) {
   return answer;
 }
 
-void ROB::listenCDB(BoardCastInfo info) {
+ROBFlushReg ROB::flushRegAsk(uint32_t begin, uint32_t end) {
+  ROBFlushReg result;
+  for (int i = 0; i < 32; ++i) {
+    result.recover[i] = ROBSIZE + 1;
+  }
+  for (int i = end; isBetween(begin, end, i); i = front(i)) {
+    if (storage[i].busy.getValue()) {
+      result.recover[storage[i].rd] = storage[i].origin_index;
+    }
+  }
+  return result;
+}
+
+void ROB::listenCDB(BoardCastInfo &info) {
   if (info.index >= ROBSIZE) {
     return;
   }
@@ -57,36 +62,19 @@ void ROB::listenCDB(BoardCastInfo info) {
     if (storage[info.index].busy.getValue() &&
         (storage[info.index].predict_taken != info.flag ||
          storage[info.index].predict_branch != info.branch)) {
-      flush_flag = true;
       ROBFlushInfo flush_info;
-      ROBFlushReg flush_regs;
       flush_info.pc = storage[info.index].pc;
       flush_info.branch = info.branch;
       flush_info.taken = info.flag;
       flush_info.branch_index = next(info.index);
       flush_info.final_index = front(head_.getValue());
       ROB_flush.writeValue(flush_info);
-      for (int i = 0; i < 32; ++i) {
-        flush_regs.recover[i] = ROBSIZE + 1;
-      }
-      for (int i = flush_info.final_index; i != info.index; i = front(i)) {
-        if (storage[i].busy.getTemp()) {
-          flush_regs.recover[storage[i].rd] = storage[i].origin_index;
-        }
-      }
-      ROB_flush_reg.writeValue(flush_regs);
-      for (int i = flush_info.branch_index;
-           isBetween(flush_info.branch_index, flush_info.final_index, i);
-           i = next(i)) {
-        storage[i].busy.writeValue(false);
-      }
-      tail_.writeValue(next(info.index));
     }
   }
 }
 
 ROBCommitInfo ROB::tryCommit() {
-  if (flush_flag) {
+  if (ROB_flush.getTemp().branch != 0) {
     return ROBCommitInfo();
   }
   ROBCommitInfo answer;
@@ -109,13 +97,21 @@ ROBCommitInfo ROB::tryCommit() {
   return answer;
 }
 
+void ROB::flushReceive(ROBFlushInfo &info) {
+  uint32_t begin = info.branch_index;
+  uint32_t end = info.final_index;
+  for (int i = begin; isBetween(begin, end, i); i = next(i)) {
+    storage[i].busy.writeValue(false);
+  }
+  tail_.writeValue(begin);
+}
+
 bool ROB::fullCheck() {
   int32_t head_now = head_.getTemp();
   return head_now == tail_.getTemp() && storage[head_now].busy.getTemp();
 }
 
 void ROB::refresh() {
-  flush_flag = false;
   head_.refresh();
   tail_.refresh();
   for (int i = 0; i < ROBSIZE; ++i) {

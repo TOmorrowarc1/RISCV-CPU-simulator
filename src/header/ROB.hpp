@@ -25,21 +25,24 @@ private:
   ROBItem storage[50];
   buffer<int32_t> head_;
   buffer<int32_t> tail_;
-  bool flush_flag;
 
   ROB();
   bool empty();
-  bool full();
   int32_t front(int32_t now);
   int32_t next(int32_t now);
 
 public:
   static ROB &getInstance();
+
   uint32_t getTail();
   void newIns(ROBInsInfo info);
   BusyValue getOperand(uint32_t index);
+  ROBFlushReg flushRegAsk(uint32_t begin, uint32_t end);
+
+  void listenCDB(BoardCastInfo &info);
   ROBCommitInfo tryCommit();
-  void listenCDB(BoardCastInfo info);
+  void flushReceive(ROBFlushInfo &info);
+
   bool fullCheck();
   void refresh();
   void print_out();
