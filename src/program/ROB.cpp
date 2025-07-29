@@ -23,12 +23,12 @@ void ROB::newIns(ROBInsInfo info) {
     return;
   }
   int32_t tail_now = tail_.getValue();
-  storage[tail_now].busy = true;
-  storage[tail_now].state = false;
+  storage[tail_now].busy.writeValue(true);
+  storage[tail_now].state.writeValue(false);
   storage[tail_now].pc = info.pc;
   storage[tail_now].rd = info.rd;
   if (info.pc == ENDPC) {
-    storage[tail_now].state = true;
+    storage[tail_now].state.writeValue(true);
   }
   storage[tail_now].origin_index = info.origin_index;
   storage[tail_now].predict_branch = info.predict_branch;
@@ -48,7 +48,7 @@ BusyValue ROB::getOperand(uint32_t index) {
 }
 
 void ROB::listenCDB(BoardCastInfo info) {
-  if (info.index >= 50) {
+  if (info.index >= ROBSIZE) {
     return;
   }
   storage[info.index].state.writeValue(true);
@@ -95,8 +95,8 @@ ROBCommitInfo ROB::tryCommit() {
     answer.index = head_now;
     answer.rd = storage[head_now].rd;
     answer.value = storage[head_now].result;
-    storage[head_now].busy = false;
-    if (storage[head_now].predict_branch == -114514) {
+    storage[head_now].busy.writeValue(false);
+    if (storage[head_now].pc == ENDPC) {
       stop_flag = true;
     }
     head_.writeValue(next(head_now));
@@ -116,6 +116,12 @@ bool ROB::fullCheck() {
 
 void ROB::refresh() {
   flush_flag = false;
+  head_.refresh();
+  tail_.refresh();
+  for (int i = 0; i < ROBSIZE; ++i) {
+    storage[i].busy.refresh();
+    storage[i].state.refresh();
+  }
   ROB_commit.writeValue(ROBCommitInfo());
   ROB_flush.writeValue(ROBFlushInfo());
   ROB_flush_reg.writeValue(ROBFlushReg());
