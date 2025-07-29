@@ -141,11 +141,10 @@ void StageBoardcast() {
 
 void StageCommit() {
   auto flush_info = ROB_flush.getValue();
+  auto CDB_info = CDB_result.getValue();
+  ROB::getInstance().listenCDB(CDB_info);
   if (flush_info.branch != 0) {
     ROB::getInstance().flushReceive(flush_info);
-  } else {
-    auto CDB_info = CDB_result.getValue();
-    ROB::getInstance().listenCDB(CDB_info);
   }
   ROB_commit.writeValue(ROB::getInstance().tryCommit());
 }
@@ -164,7 +163,6 @@ void RefreshStage() {
   CDB_result.refresh();
   ROB_commit.refresh();
   ROB_flush.refresh();
-  ROB_flush_reg.refresh();
 
   // 旁路：组合逻辑，以新状态更新新状态。
   auto flush = ROB_flush.getValue();

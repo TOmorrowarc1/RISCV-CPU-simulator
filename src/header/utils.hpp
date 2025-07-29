@@ -40,7 +40,7 @@ enum class BranchType { JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU };
 
 struct DecodeInsInfo {
   /*Info used by more than one executor.*/
-  InsType type;
+  InsType type = InsType::CALC;
   uint32_t register1 = 0;
   uint32_t register2 = 0;
   uint32_t immediate = 0;
@@ -138,7 +138,6 @@ extern buffer<BoardCastInfo> CDB_result;
 
 extern buffer<ROBCommitInfo> ROB_commit;
 extern buffer<ROBFlushInfo> ROB_flush;
-extern buffer<ROBFlushReg> ROB_flush_reg;
 
 extern bool stall_flag;
 extern bool ALU_stall;

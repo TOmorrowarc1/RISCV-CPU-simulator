@@ -120,7 +120,6 @@ void ROB::refresh() {
   }
   ROB_commit.writeValue(ROBCommitInfo());
   ROB_flush.writeValue(ROBFlushInfo());
-  ROB_flush_reg.writeValue(ROBFlushReg());
 }
 
 void ROB::print_out() {
