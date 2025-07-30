@@ -25,6 +25,9 @@ BasicInsInfo PC::fetchCommand() {
 void PC::flushReceive(ROBFlushInfo &info) {
   pc_.writeValue(info.branch);
   pc_.refresh();
+}
+
+void PC::predictReceive(ROBFlushInfo &info) {
   BAT_[info.pc & COVER].refreshAddress(info.branch);
   BAT_[info.pc & COVER].refreshCondition(info.taken);
 }

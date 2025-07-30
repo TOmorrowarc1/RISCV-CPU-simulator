@@ -27,6 +27,7 @@ public:
   BranchPredictInfo branchPredict();
   BasicInsInfo fetchCommand();
   void flushReceive(ROBFlushInfo &info);
+  void predictReceive(ROBFlushInfo &info);
   void refresh();
 };
 
