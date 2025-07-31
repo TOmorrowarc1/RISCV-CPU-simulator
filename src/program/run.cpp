@@ -194,7 +194,6 @@ void RefreshStage() {
 void print_log() {
   auto ins_info = Fetch_command.getValue();
   std::cout << "ins_pc: " << ins_info.ins_pc << '\n';
-  /*
   auto alu_ready = ALU_ready.getValue();
   auto bu_ready = BU_ready.getValue();
   auto alu_result = ALU_result.getValue();
@@ -216,5 +215,5 @@ void print_log() {
             << ' ' << flush.branch << ' ' << flush.taken << '\n';
   LSB::getInstance().print_out();
   ROB::getInstance().print_out();
-  std::cout << '\n';*/
+  std::cout << '\n';
 }

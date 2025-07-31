@@ -72,8 +72,10 @@ void ROB::listenCDB(BoardCastInfo &info) {
       if (storage[info.index].predict_taken != info.flag ||
           storage[info.index].predict_branch != info.branch) {
         flush_info.flag = true;
-        flush_info.branch_index = next(info.index);
-        flush_info.final_index = front(head_.getValue());
+        if (next(info.index) != head_.getValue()) {
+          flush_info.branch_index = next(info.index);
+          flush_info.final_index = front(head_.getValue());
+        }
       }
       ROB_flush.writeValue(flush_info);
     }
@@ -108,12 +110,14 @@ ROBCommitInfo ROB::tryCommit() {
 }
 
 void ROB::flushReceive(ROBFlushInfo &info) {
-  uint32_t begin = info.branch_index;
-  uint32_t end = info.final_index;
-  for (int i = begin; isBetween(begin, end, i); i = next(i)) {
-    storage[i].busy.writeValue(false);
+  if (info.branch_index != 50) {
+    uint32_t begin = info.branch_index;
+    uint32_t end = info.final_index;
+    for (int i = begin; isBetween(begin, end, i); i = next(i)) {
+      storage[i].busy.writeValue(false);
+    }
+    tail_.writeValue(begin);
   }
-  tail_.writeValue(begin);
 }
 
 bool ROB::fullCheck() {
