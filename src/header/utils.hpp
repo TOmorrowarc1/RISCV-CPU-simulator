@@ -148,6 +148,9 @@ extern bool LSB_stall;
 extern bool ROB_stall;
 extern bool stop_flag;
 
+extern uint32_t total_branch;
+extern uint32_t wrong_branch;
+
 constexpr int32_t ROBSIZE = 50;
 constexpr uint32_t ENDPC = -114514;
 

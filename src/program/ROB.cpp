@@ -61,12 +61,14 @@ void ROB::listenCDB(BoardCastInfo &info) {
   storage[info.index].result = info.value;
   if (info.branch != 0) {
     if (storage[info.index].busy.getTemp() && storage[info.index].is_branch) {
+      ++total_branch;
       ROBFlushInfo flush_info;
       flush_info.pc = storage[info.index].pc;
       flush_info.branch = info.branch;
       flush_info.taken = info.flag;
       if (storage[info.index].predict_taken != info.flag ||
           storage[info.index].predict_branch != info.branch) {
+        ++wrong_branch;
         flush_info.flag = true;
         flush_info.branch_index = next(info.index);
         flush_info.final_index = front(head_.getValue());

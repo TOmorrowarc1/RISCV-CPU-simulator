@@ -7,7 +7,7 @@ bool loadMemory(const std::string &filename);
 
 int main() {
   std::string file_name =
-      "/home/tomorrow_arc1/CS/RISCV-CPU-stimulation/testcases/bulgarian.data";
+      "/home/tomorrow_arc1/CS/RISCV-CPU-stimulation/testcases/naive.data";
   loadMemory(file_name);
   uint32_t clock = 0;
   while (!stop_flag) {
@@ -19,6 +19,8 @@ int main() {
     StageBoardcast();
     RefreshStage();
   }
+  std::cout << "\nthe error rate of the branch prediction is: "
+            << wrong_branch / double(total_branch);
   return 0;
 }
 
