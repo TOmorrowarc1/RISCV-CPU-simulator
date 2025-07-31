@@ -28,3 +28,6 @@ bool BU_stall = false;
 bool LSB_stall = false;
 bool ROB_stall = false;
 bool stall_flag = false;
+
+uint32_t total_branch = 0;
+uint32_t wrong_branch = 0;

@@ -25,6 +25,7 @@ void ROB::newIns(ROBInsInfo info) {
   storage[tail_now].origin_index = info.origin_index;
   storage[tail_now].predict_branch = info.predict_branch;
   storage[tail_now].predict_taken = info.predict_taken;
+  storage[tail_now].is_branch = info.is_branch;
   tail_.writeValue(next(tail_now));
 }
 
@@ -59,21 +60,29 @@ void ROB::listenCDB(BoardCastInfo &info) {
   storage[info.index].state.writeValue(true);
   storage[info.index].result = info.value;
   if (info.branch != 0) {
-    if (storage[info.index].busy.getTemp() &&
-        (storage[info.index].predict_taken != info.flag ||
-         storage[info.index].predict_branch != info.branch)) {
+    if (storage[info.index].busy.getTemp() && storage[info.index].is_branch) {
+      ++total_branch;
       ROBFlushInfo flush_info;
       flush_info.pc = storage[info.index].pc;
       flush_info.branch = info.branch;
       flush_info.taken = info.flag;
-      flush_info.branch_index = next(info.index);
-      flush_info.final_index = front(head_.getValue());
+      if (storage[info.index].predict_taken != info.flag) {
+        ++wrong_branch;
+      }
+      if (storage[info.index].predict_taken != info.flag ||
+          storage[info.index].predict_branch != info.branch) {
+        flush_info.flag = true;
+        if (next(info.index) != head_.getValue()) {
+          flush_info.branch_index = next(info.index);
+          flush_info.final_index = front(head_.getValue());
+        }
+      }
       ROB_flush.writeValue(flush_info);
     }
   }
 }
 
-void ROB::commitReceive(ROBCommitInfo& info) {
+void ROB::commitReceive(ROBCommitInfo &info) {
   for (int i = head_.getValue(); i != tail_.getValue(); i = next(i)) {
     if (storage[i].origin_index == info.index) {
       storage[i].origin_index = ROBSIZE;
@@ -101,12 +110,14 @@ ROBCommitInfo ROB::tryCommit() {
 }
 
 void ROB::flushReceive(ROBFlushInfo &info) {
-  uint32_t begin = info.branch_index;
-  uint32_t end = info.final_index;
-  for (int i = begin; isBetween(begin, end, i); i = next(i)) {
-    storage[i].busy.writeValue(false);
+  if (info.branch_index != 50) {
+    uint32_t begin = info.branch_index;
+    uint32_t end = info.final_index;
+    for (int i = begin; isBetween(begin, end, i); i = next(i)) {
+      storage[i].busy.writeValue(false);
+    }
+    tail_.writeValue(begin);
   }
-  tail_.writeValue(begin);
 }
 
 bool ROB::fullCheck() {

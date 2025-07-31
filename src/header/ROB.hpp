@@ -18,6 +18,7 @@ struct ROBItem {
   buffer<bool> state = false;
   buffer<bool> busy = false;
   bool predict_taken = false;
+  bool is_branch = false;
 };
 
 class ROB {

@@ -10,9 +10,9 @@ PC &PC::getInstance() {
 BranchPredictInfo PC::branchPredict() {
   BranchPredictInfo result;
   uint32_t pc = pc_.getValue();
-  uint32_t branch = BAT_[pc & COVER].predict();
-  result.branch_predict = (branch == 0) ? (pc_.getValue() + 4) : branch;
-  result.taken_predict = !(branch == 0);
+  result.taken_predict = if_taken_.predict(pc);
+  result.branch_predict =
+      (result.taken_predict) ? target_addr_.predict(pc) : (pc_.getValue() + 4);
   pc_.writeValue(result.branch_predict);
   return result;
 }
@@ -25,8 +25,13 @@ BasicInsInfo PC::fetchCommand() {
 void PC::flushReceive(ROBFlushInfo &info) {
   pc_.writeValue(info.branch);
   pc_.refresh();
-  BAT_[info.pc & COVER].refreshAddress(info.branch);
-  BAT_[info.pc & COVER].refreshCondition(info.taken);
+}
+
+void PC::predictReceive(ROBFlushInfo &info) {
+  if_taken_.refresh(info.pc, info.taken);
+  if (info.taken) {
+    target_addr_.refresh(info.pc, info.branch);
+  }
 }
 
 void PC::refresh() {
@@ -34,15 +39,3 @@ void PC::refresh() {
     pc_.refresh();
   }
 }
-
-void JumpState::refreshCondition(bool if_jump) {
-  if (if_jump) {
-    status = status != 3 ? status + 1 : status;
-  } else {
-    status = status != 0 ? status - 1 : status;
-  }
-}
-
-void JumpState::refreshAddress(uint32_t new_addr) { address = new_addr; }
-
-uint32_t JumpState::predict() { return (status > 1) ? address : 0; }

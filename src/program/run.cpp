@@ -1,6 +1,10 @@
 #include "run.hpp"
 
 void StageFetch() {
+  auto predict_info = ROB_flush.getValue();
+  if (predict_info.branch != 0) {
+    PC::getInstance().predictReceive(predict_info);
+  }
   PC_predict.writeValue(PC::getInstance().branchPredict());
   Fetch_command.writeValue(PC::getInstance().fetchCommand());
 }
@@ -15,7 +19,7 @@ void StageIssue() {
   LSB::getInstance().listenCDB(CDB_info);
 
   auto flush_info = ROB_flush.getValue();
-  if (flush_info.branch != 0) {
+  if (flush_info.flag) {
     auto flush_regs = ROB::getInstance().flushRegAsk(flush_info.branch_index,
                                                      flush_info.final_index);
     RegFile::getInstance().flushRecieve(flush_regs);
@@ -64,6 +68,7 @@ void StageIssue() {
     newIns_info.pc = info.pc;
     newIns_info.predict_branch = info.predict_target_addr;
     newIns_info.predict_taken = info.predict_taken;
+    newIns_info.is_branch = (info.type == InsType::BRANCH);
     if (info.allow) {
       if (info.type != InsType::END) {
         auto write_info = RegFile::getInstance().tryWrite(info.rd, index);
@@ -102,7 +107,7 @@ void StageExecute() {
   auto branch_info = BU_ready.getValue();
   auto commit_info = ROB_commit.getValue();
   auto flush_info = ROB_flush.getValue();
-  if (flush_info.branch != 0) {
+  if (flush_info.flag) {
     if (isBetween(flush_info.branch_index, flush_info.final_index,
                   alu_info.index)) {
       ALU_result.writeValue(BoardCastInfo());
@@ -131,7 +136,7 @@ void StageBoardcast() {
   CDBSelector::getInstance().newInfo(branch_result);
   CDBSelector::getInstance().newInfo(ls_result);
   auto flush_info = ROB_flush.getValue();
-  if (flush_info.branch != 0) {
+  if (flush_info.flag) {
     CDBSelector::getInstance().flushReceive(flush_info);
     CDB_result.writeValue(BoardCastInfo());
     return;
@@ -143,7 +148,8 @@ void StageCommit() {
   auto flush_info = ROB_flush.getValue();
   auto Commit_info = ROB_commit.getValue();
   auto CDB_info = CDB_result.getValue();
-  if (flush_info.branch != 0) {
+  ROB::getInstance().commitReceive(Commit_info);
+  if (flush_info.flag) {
     ROB::getInstance().flushReceive(flush_info);
   } else {
     ROB::getInstance().commitReceive(Commit_info);
@@ -168,9 +174,9 @@ void RefreshStage() {
   ROB_flush.refresh();
 
   // 旁路：组合逻辑，以新状态更新新状态。
-  auto flush = ROB_flush.getValue();
-  if (flush.branch != 0) {
-    PC::getInstance().flushReceive(flush);
+  auto flush_info = ROB_flush.getValue();
+  if (flush_info.flag) {
+    PC::getInstance().flushReceive(flush_info);
   }
 
   PC::getInstance().refresh();
@@ -179,7 +185,7 @@ void RefreshStage() {
   LSB::getInstance().refresh();
   ROB::getInstance().refresh();
 
-  // print_log();
+  //print_log();
 
   if (stop_flag) {
     auto commit_check = ROB_commit.getValue();
@@ -189,6 +195,7 @@ void RefreshStage() {
 
 void print_log() {
   auto ins_info = Fetch_command.getValue();
+  std::cout << "ins_pc: " << ins_info.ins_pc << '\n';
   auto alu_ready = ALU_ready.getValue();
   auto bu_ready = BU_ready.getValue();
   auto alu_result = ALU_result.getValue();

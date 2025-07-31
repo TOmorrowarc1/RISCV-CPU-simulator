@@ -102,6 +102,7 @@ struct ROBInsInfo {
   uint32_t origin_index = 50;
   uint32_t predict_branch = 0;
   bool predict_taken = false;
+  bool is_branch = false;
 };
 
 struct ROBCommitInfo {
@@ -116,6 +117,7 @@ struct ROBFlushInfo {
   uint32_t branch_index = 50;
   uint32_t final_index = 50;
   bool taken = false;
+  bool flag = false;
 };
 
 struct ROBFlushReg {
@@ -145,6 +147,9 @@ extern bool BU_stall;
 extern bool LSB_stall;
 extern bool ROB_stall;
 extern bool stop_flag;
+
+extern uint32_t total_branch;
+extern uint32_t wrong_branch;
 
 constexpr int32_t ROBSIZE = 50;
 constexpr uint32_t ENDPC = -114514;
