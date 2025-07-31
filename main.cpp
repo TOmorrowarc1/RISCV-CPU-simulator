@@ -17,8 +17,6 @@ int main() {
     StageBoardcast();
     RefreshStage();
   }
-  std::cout << "\nthe error rate of the branch prediction is: "
-            << wrong_branch / double(total_branch);
   return 0;
 }
 
