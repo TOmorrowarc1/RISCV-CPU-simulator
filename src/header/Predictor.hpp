@@ -62,8 +62,8 @@ public:
 
 class TournamentPredictor {
 private:
-  LocalHistoryPredictor predictor1_;
-  GlobalHistoryPredictor predictor2_;
+  GlobalHistoryPredictor predictor1_;
+  LocalHistoryPredictor predictor2_;
   PHTPredictor meta_predictor_;
 
 public:
