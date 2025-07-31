@@ -17,6 +17,7 @@ set(SOURCES
     src/program/Executor.cpp
     src/program/memory.cpp
     src/program/PC.cpp
+    src/program/Predictor.cpp
     src/program/RegFile.cpp
     src/program/ROB.cpp
     src/program/RS.cpp
