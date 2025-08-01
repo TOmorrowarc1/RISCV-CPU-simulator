@@ -19,7 +19,7 @@ The result is as follows:
 |     magic      |  0.14865   |
 | manyarguments  |    0.55    |
 |   multiarray   |  0.33125   |
-|       pi       |    ???     |
+|       pi       |  0.16676   |
 |     qsort      | 0.0792181  |
 |     queens     |  0.214196  |
 | statement_test |  0.459016  |
